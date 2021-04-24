@@ -78,6 +78,26 @@ int16-scalar = 5518.05 GIOPS
 int16-vec4   = 7138.91 GIOPS
 ```
 
+```
+nihui@nihui-macbook-air vkpeak-20210424-macos % ./vkpeak 0 
+device       = Apple M1
+
+fp32-scalar  = 2093.55 GFLOPS
+fp32-vec4    = 2369.02 GFLOPS
+
+fp16-scalar  = 2195.79 GFLOPS
+fp16-vec4    = 2513.04 GFLOPS
+
+fp64-scalar  = 0.00 GFLOPS
+fp64-vec4    = 0.00 GFLOPS
+
+int32-scalar = 653.38 GIOPS
+int32-vec4   = 649.56 GIOPS
+
+int16-scalar = 653.42 GIOPS
+int16-vec4   = 652.94 GIOPS
+```
+
 ## Other Open-Source Code Used
 
 - https://github.com/Tencent/ncnn for fast neural network inference on ALL PLATFORMS
