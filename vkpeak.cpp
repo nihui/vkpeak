@@ -403,6 +403,14 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         return 0;
     }
 
+#if __APPLE__
+    if (storage_type == 2 || arithmetic_type == 2)
+    {
+        // no double type on MSL
+        return 0;
+    }
+#endif
+
     double max_gflops = 0;
 
     int loop = 1024;
