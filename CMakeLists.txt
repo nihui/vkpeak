@@ -5,28 +5,7 @@ set(CMAKE_BUILD_TYPE release)
 
 option(USE_STATIC_MOLTENVK "link moltenvk static library" OFF)
 
-find_package(Threads)
-find_package(OpenMP)
 find_package(Vulkan REQUIRED)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-if(OPENMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif()
-
-# enable global link time optimization
-cmake_policy(SET CMP0069 NEW)
-set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
-include(CheckIPOSupported)
-check_ipo_supported(RESULT ipo_supported OUTPUT ipo_supported_output)
-if(ipo_supported)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-else()
-    message(WARNING "IPO is not supported: ${ipo_supported_output}")
-endif()
 
 # build ncnn library
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ncnn/CMakeLists.txt")
@@ -47,6 +26,8 @@ option(NCNN_BUILD_TESTS "" OFF)
 option(NCNN_BUILD_TOOLS "" OFF)
 option(NCNN_BUILD_EXAMPLES "" OFF)
 option(NCNN_INT8 "" OFF)
+option(NCNN_OPENMP "" OFF)
+option(NCNN_THREADS "" OFF)
 option(NCNN_DISABLE_RTTI "" ON)
 option(NCNN_DISABLE_EXCEPTION "" ON)
 
