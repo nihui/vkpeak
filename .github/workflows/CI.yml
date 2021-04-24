@@ -25,7 +25,7 @@ jobs:
       run: |
         $env:VULKAN_SDK="$(pwd)/VulkanSDK"
         mkdir build; cd build
-        cmake -A x64 ../src
+        cmake -A x64 ..
         cmake --build . --config Release -j 2
 
   ubuntu:
@@ -51,7 +51,7 @@ jobs:
       run: |
         export VULKAN_SDK=`pwd`/1.2.162.0/x86_64
         mkdir build && cd build
-        cmake ../src
+        cmake ..
         cmake --build . -j 2
 
   macos:
@@ -82,7 +82,7 @@ jobs:
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="x86_64" \
             -DVulkan_INCLUDE_DIR=`pwd`/../vulkansdk-macos-1.2.162.0/MoltenVK/include \
             -DVulkan_LIBRARY=`pwd`/../vulkansdk-macos-1.2.162.0/MoltenVK/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a \
-            ../src
+            ..
         cmake --build . -j 2
     - name: build-arm64
       run: |
@@ -91,5 +91,5 @@ jobs:
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="arm64" \
             -DVulkan_INCLUDE_DIR=`pwd`/../vulkansdk-macos-1.2.162.0/MoltenVK/include \
             -DVulkan_LIBRARY=`pwd`/../vulkansdk-macos-1.2.162.0/MoltenVK/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a \
-            ../src
+            ..
         cmake --build . -j 2
