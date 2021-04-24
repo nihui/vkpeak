@@ -71,11 +71,11 @@ fp16-vec4    = 16261.30 GFLOPS
 fp64-scalar  = 262.86 GFLOPS
 fp64-vec4    = 262.86 GFLOPS
 
-int32-scalar = 8363.63 GILOPS
-int32-vec4   = 8313.07 GILOPS
+int32-scalar = 8363.63 GIOPS
+int32-vec4   = 8313.07 GIOPS
 
-int16-scalar = 5518.05 GILOPS
-int16-vec4   = 7138.91 GILOPS
+int16-scalar = 5518.05 GIOPS
+int16-vec4   = 7138.91 GIOPS
 ```
 
 ## Other Open-Source Code Used

@@ -615,12 +615,12 @@ int main(int argc, char** argv)
     fprintf(stderr, "fp64-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 1));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "int32-scalar = %.2f GILOPS\n", vkpeak(device_id, 3, 3, 0));
-    fprintf(stderr, "int32-vec4   = %.2f GILOPS\n", vkpeak(device_id, 3, 3, 1));
+    fprintf(stderr, "int32-scalar = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 0));
+    fprintf(stderr, "int32-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 1));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "int16-scalar = %.2f GILOPS\n", vkpeak(device_id, 4, 4, 0));
-    fprintf(stderr, "int16-vec4   = %.2f GILOPS\n", vkpeak(device_id, 4, 4, 1));
+    fprintf(stderr, "int16-scalar = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 0));
+    fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 1));
 
     return 0;
 }
