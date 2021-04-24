@@ -5,6 +5,7 @@ set(CMAKE_BUILD_TYPE release)
 
 option(USE_STATIC_MOLTENVK "link moltenvk static library" OFF)
 
+find_package(Threads)
 find_package(Vulkan REQUIRED)
 
 # build ncnn library
@@ -27,7 +28,7 @@ option(NCNN_BUILD_TOOLS "" OFF)
 option(NCNN_BUILD_EXAMPLES "" OFF)
 option(NCNN_INT8 "" OFF)
 option(NCNN_OPENMP "" OFF)
-option(NCNN_THREADS "" OFF)
+option(NCNN_THREADS "" ON)
 option(NCNN_DISABLE_RTTI "" ON)
 option(NCNN_DISABLE_EXCEPTION "" ON)
 
