@@ -582,6 +582,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    ncnn::create_gpu_instance();
+
     const int gpu_count = ncnn::get_gpu_count();
     if (gpu_count == 0)
     {
@@ -629,6 +631,8 @@ int main(int argc, char** argv)
     fprintf(stderr, "\n");
     fprintf(stderr, "int16-scalar = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 0));
     fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 1));
+
+    ncnn::destroy_gpu_instance();
 
     return 0;
 }
