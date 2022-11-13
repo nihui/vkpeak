@@ -7,6 +7,8 @@ env:
 jobs:
   windows:
     runs-on: windows-latest
+    env:
+      UseMultiToolTask: true
     steps:
     - uses: actions/checkout@v2
       with:
