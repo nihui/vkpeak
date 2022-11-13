@@ -22,7 +22,7 @@ jobs:
       run: |
         Invoke-WebRequest -Uri https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/windows/VulkanSDK-${{ env.VULKANSDK_VERSION }}-Installer.exe?Human=true -OutFile VulkanSDK-${{ env.VULKANSDK_VERSION }}-Installer.exe
         7z x -aoa ./VulkanSDK-${{ env.VULKANSDK_VERSION }}-Installer.exe -oVulkanSDK
-        Remove-Item .\VulkanSDK\Demos, .\VulkanSDK\Samples, .\VulkanSDK\Third-Party, .\VulkanSDK\Tools, .\VulkanSDK\Tools32, .\VulkanSDK\Bin32, .\VulkanSDK\Lib32 -Recurse
+        Remove-Item .\VulkanSDK\Demos, .\VulkanSDK\Config, .\VulkanSDK\Helpers, .\VulkanSDK\Source, .\VulkanSDK\Templates, .\VulkanSDK\Bin32, .\VulkanSDK\Lib32 -Recurse
     - name: build
       run: |
         $env:VULKAN_SDK="$(pwd)/VulkanSDK"
@@ -47,7 +47,7 @@ jobs:
       run: |
         wget https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/linux/vulkansdk-linux-x86_64-${{ env.VULKANSDK_VERSION }}.tar.gz?Human=true -O vulkansdk-linux-x86_64-${{ env.VULKANSDK_VERSION }}.tar.gz
         tar -xf vulkansdk-linux-x86_64-${{ env.VULKANSDK_VERSION }}.tar.gz
-        rm -rf ${{ env.VULKANSDK_VERSION }}/source ${{ env.VULKANSDK_VERSION }}/samples
+        rm -rf ${{ env.VULKANSDK_VERSION }}/source
         find ${{ env.VULKANSDK_VERSION }} -type f | grep -v -E 'vulkan|glslang' | xargs rm
     - name: build
       run: |
@@ -77,6 +77,7 @@ jobs:
         rm -rf vulkansdk-macos-${{ env.VULKANSDK_VERSION }}/Applications
         find vulkansdk-macos-${{ env.VULKANSDK_VERSION }} -type f | grep -v -E 'vulkan|glslang|MoltenVK' | xargs rm
         hdiutil detach /Volumes/vulkansdk-macos-${{ env.VULKANSDK_VERSION }}
+        find vulkansdk-macos-${{ env.VULKANSDK_VERSION }}
     - name: build-x86_64
       run: |
         export VULKAN_SDK=`pwd`/vulkansdk-macos-${{ env.VULKANSDK_VERSION }}/macOS
