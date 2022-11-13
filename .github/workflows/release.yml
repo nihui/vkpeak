@@ -105,7 +105,6 @@ jobs:
     runs-on: windows-latest
     env:
       UseMultiToolTask: true
-    env:
       PACKAGENAME: ${{ env.APPLICATION_NAME }}-${{ needs.setup.outputs.VERSION }}-windows
     steps:
     - uses: actions/checkout@v2
