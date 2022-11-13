@@ -14,8 +14,12 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
+      APPNAME: ${{ steps.get_appname.outputs.APPNAME }}
       VERSION: ${{ steps.get_version.outputs.VERSION }}
     steps:
+    - name: get-appname
+      id: get_appname
+      run: echo "APPNAME=${APPLICATION_NAME}" >> $GITHUB_OUTPUT
     - name: get-version
       id: get_version
       run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
@@ -24,7 +28,7 @@ jobs:
     needs: [setup]
     runs-on: ubuntu-18.04
     env:
-      PACKAGENAME: ${{ env.APPLICATION_NAME }}-${{ needs.setup.outputs.VERSION }}-ubuntu
+      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-ubuntu
     steps:
     - uses: actions/checkout@v2
       with:
@@ -43,8 +47,8 @@ jobs:
       run: |
         mkdir -p ${{ env.PACKAGENAME }}
         cp README.md LICENSE ${{ env.PACKAGENAME }}
-        cp build/${{ env.APPLICATION_NAME }} ${{ env.PACKAGENAME }}
-        strip -g ${{ env.PACKAGENAME }}/${{ env.APPLICATION_NAME }}
+        cp build/${{ needs.setup.outputs.APPNAME }} ${{ env.PACKAGENAME }}
+        strip -g ${{ env.PACKAGENAME }}/${{ needs.setup.outputs.APPNAME }}
         zip -9 -r ${{ env.PACKAGENAME }}.zip ${{ env.PACKAGENAME }}
     - name: upload
       uses: actions/upload-artifact@v2
@@ -56,7 +60,7 @@ jobs:
     needs: [setup]
     runs-on: macos-12
     env:
-      PACKAGENAME: ${{ env.APPLICATION_NAME }}-${{ needs.setup.outputs.VERSION }}-macos
+      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-macos
     steps:
     - uses: actions/checkout@v2
       with:
@@ -91,8 +95,8 @@ jobs:
       run: |
         mkdir -p ${{ env.PACKAGENAME }}
         cp README.md LICENSE ${{ env.PACKAGENAME }}
-        lipo -create build-x86_64/${{ env.APPLICATION_NAME }} build-arm64/${{ env.APPLICATION_NAME }} -o ${{ env.PACKAGENAME }}/${{ env.APPLICATION_NAME }}
-        strip ${{ env.PACKAGENAME }}/${{ env.APPLICATION_NAME }}
+        lipo -create build-x86_64/${{ needs.setup.outputs.APPNAME }} build-arm64/${{ needs.setup.outputs.APPNAME }} -o ${{ env.PACKAGENAME }}/${{ needs.setup.outputs.APPNAME }}
+        strip ${{ env.PACKAGENAME }}/${{ needs.setup.outputs.APPNAME }}
         zip -9 -r ${{ env.PACKAGENAME }}.zip ${{ env.PACKAGENAME }}
     - name: upload
       uses: actions/upload-artifact@v2
@@ -105,7 +109,7 @@ jobs:
     runs-on: windows-latest
     env:
       UseMultiToolTask: true
-      PACKAGENAME: ${{ env.APPLICATION_NAME }}-${{ needs.setup.outputs.VERSION }}-windows
+      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-windows
     steps:
     - uses: actions/checkout@v2
       with:
@@ -125,7 +129,7 @@ jobs:
         mkdir ${{ env.PACKAGENAME }}
         Copy-Item -Verbose -Path "README.md" -Destination "${{ env.PACKAGENAME }}"
         Copy-Item -Verbose -Path "LICENSE" -Destination "${{ env.PACKAGENAME }}"
-        Copy-Item -Verbose -Path "build\Release\${{ env.APPLICATION_NAME }}.exe" -Destination "${{ env.PACKAGENAME }}"
+        Copy-Item -Verbose -Path "build\Release\${{ needs.setup.outputs.APPNAME }}.exe" -Destination "${{ env.PACKAGENAME }}"
         7z a -r ${{ env.PACKAGENAME }}.zip ${{ env.PACKAGENAME }}
     - name: upload
       uses: actions/upload-artifact@v2
@@ -157,7 +161,7 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PACKAGENAME: ${{ env.APPLICATION_NAME }}-${{ needs.setup.outputs.VERSION }}-ubuntu
+        PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-ubuntu
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: artifacts/${{ env.PACKAGENAME }}/${{ env.PACKAGENAME }}.zip
@@ -168,7 +172,7 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PACKAGENAME: ${{ env.APPLICATION_NAME }}-${{ needs.setup.outputs.VERSION }}-macos
+        PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-macos
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: artifacts/${{ env.PACKAGENAME }}/${{ env.PACKAGENAME }}.zip
@@ -179,7 +183,7 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PACKAGENAME: ${{ env.APPLICATION_NAME }}-${{ needs.setup.outputs.VERSION }}-windows
+        PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-windows
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: artifacts/${{ env.PACKAGENAME }}/${{ env.PACKAGENAME }}.zip
