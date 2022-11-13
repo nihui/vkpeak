@@ -2,7 +2,7 @@ name: CI
 on: [push, pull_request]
 env:
   VULKANSDK_VERSION: 1.3.231.1
-  DEVELOPER_DIR: /Applications/Xcode_12.4.app/Contents/Developer
+  DEVELOPER_DIR: /Applications/Xcode_14.0.1.app/Contents/Developer
 
 jobs:
   windows:
@@ -14,7 +14,7 @@ jobs:
     - name: vulkansdk
       run: |
         Invoke-WebRequest -Uri https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/windows/VulkanSDK-${{ env.VULKANSDK_VERSION }}-Installer.exe?Human=true -OutFile VulkanSDK-${{ env.VULKANSDK_VERSION }}-Installer.exe
-        VulkanSDK-${{ env.VULKANSDK_VERSION }}-Installer.exe --root $env:GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }} --accept-licenses --default-answer --confirm-command install
+        ./VulkanSDK-${{ env.VULKANSDK_VERSION }}-Installer.exe --root $env:GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }} --accept-licenses --default-answer --confirm-command install
     - name: build
       run: |
         $env:VULKAN_SDK="$env:GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }}"
@@ -40,7 +40,7 @@ jobs:
         cmake --build . -j 2
 
   macos:
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
       with:
