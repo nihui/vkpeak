@@ -403,13 +403,21 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         return 0;
     }
 
-#if __APPLE__
-    if (storage_type == 2 || arithmetic_type == 2)
+    // query shader fp64 feature
+    bool has_shader_fp64 = false;
     {
-        // no double type on MSL
+        VkPhysicalDevice physicalDevice = vkdev->info.physical_device();
+
+        VkPhysicalDeviceFeatures features;
+        vkGetPhysicalDeviceFeatures(physicalDevice, &features);
+
+        has_shader_fp64 = features.shaderFloat64;
+    }
+
+    if (!has_shader_fp64 && (storage_type == 2 || arithmetic_type == 2))
+    {
         return 0;
     }
-#endif
 
     double max_gflops = 0;
 

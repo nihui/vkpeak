@@ -18,10 +18,10 @@ jobs:
     steps:
     - name: get-appname
       id: get_appname
-      run: echo ::set-output name=APPNAME::${APPLICATION_NAME}
+      run: echo "APPNAME=${APPLICATION_NAME}" >> $GITHUB_OUTPUT
     - name: get-version
       id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
   ubuntu:
     needs: [setup]
@@ -66,7 +66,7 @@ jobs:
 
   macos:
     needs: [setup]
-    runs-on: macos-latest
+    runs-on: macos-11
     env:
       PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-macos
     steps:
