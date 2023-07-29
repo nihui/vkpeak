@@ -377,6 +377,144 @@ void main()
 }
 )";
 
+static const char glsl_fp16_matrix_nv_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_NV_cooperative_matrix: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) readonly buffer a_blob { uvec4 a_blob_data[]; };
+layout (binding = 1) readonly buffer b_blob { uvec4 b_blob_data[]; };
+layout (binding = 2) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+shared uvec4 tmp_a[16*2];
+shared uvec4 tmp_b[16*2];
+
+void main()
+{
+    const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
+
+    if (lx < 32)
+    {
+        tmp_a[lx] = a_blob_data[gx];
+        tmp_b[lx] = b_blob_data[gx];
+    }
+
+    barrier();
+
+    fcoopmatNV<16, gl_ScopeSubgroup, 16, 16> a;
+    fcoopmatNV<16, gl_ScopeSubgroup, 16, 16> b;
+    coopMatLoadNV(a, tmp_a, 0, 2, false);
+    coopMatLoadNV(b, tmp_b, 0, 2, false);
+
+    fcoopmatNV<16, gl_ScopeSubgroup, 16, 16> c = fcoopmatNV<16, gl_ScopeSubgroup, 16, 16>(0.f);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+    }
+
+    coopMatStoreNV(c, tmp_a, 0, 2, false);
+
+    barrier();
+
+    if (lx < 32)
+    {
+        c_blob_data[gx] = tmp_a[lx];
+    }
+}
+)";
+
+static const char glsl_fp16_matrix_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) readonly buffer a_blob { uvec4 a_blob_data[]; };
+layout (binding = 1) readonly buffer b_blob { uvec4 b_blob_data[]; };
+layout (binding = 2) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+shared uvec4 tmp_a[16*2];
+shared uvec4 tmp_b[16*2];
+
+void main()
+{
+    const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
+
+    if (lx < 32)
+    {
+        tmp_a[lx] = a_blob_data[gx];
+        tmp_b[lx] = b_blob_data[gx];
+    }
+
+    barrier();
+
+    coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseA> a;
+    coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseAccumulator> b;
+    coopMatLoad(a, tmp_a, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatLoad(b, tmp_b, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
+
+    coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseAccumulator> c = coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseAccumulator>(0.f);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, c, b);
+    }
+
+    coopMatStore(c, tmp_a, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
+
+    barrier();
+
+    if (lx < 32)
+    {
+        c_blob_data[gx] = tmp_a[lx];
+    }
+}
+)";
+
 static double vkpeak(int device_id, int storage_type, int arithmetic_type, int packing_type)
 {
     ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device(device_id);
@@ -402,6 +540,10 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
+    if (!vkdev->info.support_cooperative_matrix_16_16_16() && packing_type == 256)
+    {
+        return 0;
+    }
 
     // query shader fp64 feature
     bool has_shader_fp64 = false;
@@ -424,6 +566,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     int loop = 1024;
     int count = 256 * 1024;
 
+    if (packing_type == 256)
+    {
+        loop = 64;
+        count = 32 * 1024;
+    }
+
     ncnn::Option opt;
     opt.use_vulkan_compute = true;
     opt.use_fp16_packed = storage_type == 1;
@@ -443,6 +591,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         ncnn::Pipeline pipeline(vkdev);
         {
             int local_size_x = std::min(128, std::max(1, (int)vkdev->info.subgroup_size()));
+
+            if (packing_type == 256)
+            {
+                // matrix on subgroup
+                local_size_x = (int)vkdev->info.subgroup_size();
+            }
 
             pipeline.set_local_size_xyz(local_size_x, 1, 1);
 
@@ -485,7 +639,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     ncnn::compile_spirv_module(glsl_int16_p4_data, sizeof(glsl_int16_p4_data) - 1, opt, spirv);
                 }
             }
-            else
+            else // if (storage_type == 1)
             {
                 if (packing_type == 0)
                 {
@@ -495,12 +649,28 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 {
                     ncnn::compile_spirv_module(glsl_p4_data, sizeof(glsl_p4_data) - 1, opt, spirv);
                 }
+                if (packing_type == 256)
+                {
+                    if (vkdev->info.support_VK_KHR_cooperative_matrix())
+                    {
+                        ncnn::compile_spirv_module(glsl_fp16_matrix_khr_data, sizeof(glsl_fp16_matrix_khr_data) - 1, opt, spirv);
+                    }
+                    else
+                    {
+                        ncnn::compile_spirv_module(glsl_fp16_matrix_nv_data, sizeof(glsl_fp16_matrix_nv_data) - 1, opt, spirv);
+                    }
+                }
             }
 
             pipeline.create(spirv.data(), spirv.size() * 4, specializations);
         }
 
-        const int elempack = packing_type == 0 ? 1 : 4;
+        int elempack = packing_type == 0 ? 1 : 4;
+
+        if (packing_type == 256)
+        {
+            elempack = 256;
+        }
 
         ncnn::VkMat a;
         ncnn::VkMat b;
@@ -565,7 +735,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     break;
                 }
 
-                const double mac = (double)count * (double)loop * 16 * elempack * 2;
+                double mac = (double)count * (double)loop * 16 * elempack * 2;
+
+                if (packing_type == 256)
+                {
+                    mac = (double)(count / (int)vkdev->info.subgroup_size()) * (double)loop * 16 * (256 * 16) * 2;
+                }
 
                 double gflops = mac / time / 1000000;
 
@@ -618,7 +793,7 @@ int main(int argc, char** argv)
     // device_id        = 0
     // storage_type     = 0/1/2/3/4 = fp32 fp16 fp64 int32 int16
     // arithmetic_type  = 0/1/2/3/4 = fp32 fp16 fp64 int32 int16
-    // packing_type     = 0/1       = scalar vec4
+    // packing_type     = 0/1/256   = scalar vec4 matrix
 
     fprintf(stderr, "\n");
     fprintf(stderr, "fp32-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 0));
@@ -627,6 +802,7 @@ int main(int argc, char** argv)
     fprintf(stderr, "\n");
     fprintf(stderr, "fp16-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 0));
     fprintf(stderr, "fp16-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 1));
+    fprintf(stderr, "fp16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 256));
 
     fprintf(stderr, "\n");
     fprintf(stderr, "fp64-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 0));
