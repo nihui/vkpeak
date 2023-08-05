@@ -592,7 +592,18 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         elemsize = 8;
     }
 
-    const int invocation_count = buffer_size / (elemsize * packing_type);
+    int local_size_x = std::min(128, std::max(1, (int)vkdev->info.subgroup_size()));
+    if (packing_type == 256)
+    {
+        // matrix on subgroup
+        local_size_x = (int)vkdev->info.subgroup_size();
+    }
+
+    int invocation_count = buffer_size / (elemsize * packing_type);
+    if (packing_type == 256)
+    {
+        invocation_count = invocation_count * local_size_x;
+    }
 
     double max_gflops = 0;
 
@@ -604,14 +615,6 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     while (rerun)
     {
         rerun = false;
-
-        int local_size_x = std::min(128, std::max(1, (int)vkdev->info.subgroup_size()));
-
-        if (packing_type == 256)
-        {
-            // matrix on subgroup
-            local_size_x = (int)vkdev->info.subgroup_size();
-        }
 
         // setup pipeline
         ncnn::Pipeline pipeline(vkdev);
@@ -641,7 +644,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 {
                     ncnn::compile_spirv_module(glsl_int32_p1_data, sizeof(glsl_int32_p1_data) - 1, opt, spirv);
                 }
-                if (packing_type == 1)
+                if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_int32_p4_data, sizeof(glsl_int32_p4_data) - 1, opt, spirv);
                 }
@@ -730,6 +733,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 if (packing_type == 256)
                 {
                     mac *= 16;
+                    mac /= local_size_x;
                 }
 
                 double gflops = mac / time / 1000000;
