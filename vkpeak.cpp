@@ -561,17 +561,6 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         return 0;
     }
 
-    double max_gflops = 0;
-
-    int loop = 1024;
-    int count = 256 * 1024;
-
-    if (packing_type == 256)
-    {
-        loop = 64;
-        count = 32 * 1024;
-    }
-
     ncnn::Option opt;
     opt.use_vulkan_compute = true;
     opt.use_fp16_packed = storage_type == 1;
@@ -580,6 +569,35 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
     ncnn::VkAllocator* allocator = vkdev->acquire_blob_allocator();
 
+    // reuse a b c storage, max 1G for each
+    static const int buffer_size = std::min((int)(vkdev->get_heap_budget() / 8), 1 * 1024) * 1024 * 1024;
+    ncnn::VkMat a(buffer_size, (size_t)1u, 1, allocator);
+    ncnn::VkMat b(buffer_size, (size_t)1u, 1, allocator);
+    ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
+
+    int elemsize;
+    if (storage_type == 0 || storage_type == 3)
+    {
+        // fp32 / int32
+        elemsize = 4;
+    }
+    else if (storage_type == 1 || storage_type == 4)
+    {
+        // fp16 / int16
+        elemsize = 2;
+    }
+    else // if (storage_type == 2)
+    {
+        // fp64
+        elemsize = 8;
+    }
+
+    const int invocation_count = buffer_size / (elemsize * packing_type);
+
+    double max_gflops = 0;
+
+    int loop = 32;
+
     bool rerun = true;
 
     // prepare storage
@@ -587,17 +605,17 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         rerun = false;
 
+        int local_size_x = std::min(128, std::max(1, (int)vkdev->info.subgroup_size()));
+
+        if (packing_type == 256)
+        {
+            // matrix on subgroup
+            local_size_x = (int)vkdev->info.subgroup_size();
+        }
+
         // setup pipeline
         ncnn::Pipeline pipeline(vkdev);
         {
-            int local_size_x = std::min(128, std::max(1, (int)vkdev->info.subgroup_size()));
-
-            if (packing_type == 256)
-            {
-                // matrix on subgroup
-                local_size_x = (int)vkdev->info.subgroup_size();
-            }
-
             pipeline.set_local_size_xyz(local_size_x, 1, 1);
 
             std::vector<ncnn::vk_specialization_type> specializations(1);
@@ -608,18 +626,18 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             std::vector<uint32_t> spirv;
             if (storage_type == 2)
             {
-                if (packing_type == 0)
+                if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_fp64_p1_data, sizeof(glsl_fp64_p1_data) - 1, opt, spirv);
                 }
-                if (packing_type == 1)
+                if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_fp64_p4_data, sizeof(glsl_fp64_p4_data) - 1, opt, spirv);
                 }
             }
             else if (storage_type == 3)
             {
-                if (packing_type == 0)
+                if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_int32_p1_data, sizeof(glsl_int32_p1_data) - 1, opt, spirv);
                 }
@@ -630,22 +648,22 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
             else if (storage_type == 4)
             {
-                if (packing_type == 0)
+                if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_int16_p1_data, sizeof(glsl_int16_p1_data) - 1, opt, spirv);
                 }
-                if (packing_type == 1)
+                if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_int16_p4_data, sizeof(glsl_int16_p4_data) - 1, opt, spirv);
                 }
             }
             else // if (storage_type == 1)
             {
-                if (packing_type == 0)
+                if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_p1_data, sizeof(glsl_p1_data) - 1, opt, spirv);
                 }
-                if (packing_type == 1)
+                if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_p4_data, sizeof(glsl_p4_data) - 1, opt, spirv);
                 }
@@ -665,37 +683,6 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             pipeline.create(spirv.data(), spirv.size() * 4, specializations);
         }
 
-        int elempack = packing_type == 0 ? 1 : 4;
-
-        if (packing_type == 256)
-        {
-            elempack = 256;
-        }
-
-        ncnn::VkMat a;
-        ncnn::VkMat b;
-        ncnn::VkMat c;
-        {
-            if (storage_type == 2)
-            {
-                a.create(count, (size_t)(8u * elempack), elempack, allocator);
-                b.create(count, (size_t)(8u * elempack), elempack, allocator);
-                c.create(count, (size_t)(8u * elempack), elempack, allocator);
-            }
-            else if (opt.use_fp16_packed || opt.use_fp16_storage || storage_type == 4)
-            {
-                a.create(count, (size_t)(2u * elempack), elempack, allocator);
-                b.create(count, (size_t)(2u * elempack), elempack, allocator);
-                c.create(count, (size_t)(2u * elempack), elempack, allocator);
-            }
-            else
-            {
-                a.create(count, (size_t)(4u * elempack), elempack, allocator);
-                b.create(count, (size_t)(4u * elempack), elempack, allocator);
-                c.create(count, (size_t)(4u * elempack), elempack, allocator);
-            }
-        }
-
         const int cmd_loop = 20;
 
         for (int i = 0; i < cmd_loop; i++)
@@ -710,7 +697,11 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
                 std::vector<ncnn::vk_constant_type> constants(0);
 
-                cmd.record_pipeline(&pipeline, bindings, constants, c);
+                ncnn::VkMat dispatcher;
+                dispatcher.w = invocation_count;
+                dispatcher.h = 1;
+                dispatcher.c = 1;
+                cmd.record_pipeline(&pipeline, bindings, constants, dispatcher);
             }
 
             // time this
@@ -730,16 +721,15 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 {
                     // for fast device
                     loop *= 2;
-                    count *= 2;
                     rerun = true;
                     break;
                 }
 
-                double mac = (double)count * (double)loop * 16 * elempack * 2;
+                double mac = (double)invocation_count * (double)loop * 16 * packing_type * 2;
 
                 if (packing_type == 256)
                 {
-                    mac = (double)(count / (int)vkdev->info.subgroup_size()) * (double)loop * 16 * (256 * 16) * 2;
+                    mac *= 16;
                 }
 
                 double gflops = mac / time / 1000000;
@@ -793,28 +783,28 @@ int main(int argc, char** argv)
     // device_id        = 0
     // storage_type     = 0/1/2/3/4 = fp32 fp16 fp64 int32 int16
     // arithmetic_type  = 0/1/2/3/4 = fp32 fp16 fp64 int32 int16
-    // packing_type     = 0/1/256   = scalar vec4 matrix
+    // packing_type     = 1/4/256   = scalar vec4 matrix
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "fp32-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 0));
-    fprintf(stderr, "fp32-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 1));
+    fprintf(stderr, "fp32-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 1));
+    fprintf(stderr, "fp32-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 4));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "fp16-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 0));
-    fprintf(stderr, "fp16-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 1));
+    fprintf(stderr, "fp16-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 1));
+    fprintf(stderr, "fp16-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 4));
     fprintf(stderr, "fp16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 256));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "fp64-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 0));
-    fprintf(stderr, "fp64-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 1));
+    fprintf(stderr, "fp64-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 1));
+    fprintf(stderr, "fp64-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 4));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "int32-scalar = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 0));
-    fprintf(stderr, "int32-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 1));
+    fprintf(stderr, "int32-scalar = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 1));
+    fprintf(stderr, "int32-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 4));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "int16-scalar = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 0));
-    fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 1));
+    fprintf(stderr, "int16-scalar = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 1));
+    fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 4));
 
     ncnn::destroy_gpu_instance();
 
