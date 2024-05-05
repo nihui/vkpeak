@@ -7,11 +7,6 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_BUILD_TYPE release)
 
-option(USE_STATIC_MOLTENVK "link moltenvk static library" OFF)
-
-find_package(Threads)
-find_package(Vulkan REQUIRED)
-
 # build ncnn library
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ncnn/CMakeLists.txt")
     message(FATAL_ERROR "The submodules were not downloaded! Please update submodules with \"git submodule update --init --recursive\" and try again.")
@@ -138,35 +133,15 @@ option(WITH_LAYER_unfold "" OFF)
 option(WITH_LAYER_gridsample "" OFF)
 option(WITH_LAYER_cumulativesum "" OFF)
 option(WITH_LAYER_copyto "" OFF)
+option(WITH_LAYER_erf "" OFF)
+option(WITH_LAYER_diag "" OFF)
+option(WITH_LAYER_celu "" OFF)
+option(WITH_LAYER_shrink "" OFF)
 
 add_subdirectory(ncnn)
-
-set(APP_LINK_LIBRARIES ncnn ${Vulkan_LIBRARY})
-
-if(USE_STATIC_MOLTENVK)
-    find_library(CoreFoundation NAMES CoreFoundation)
-    find_library(Foundation NAMES Foundation)
-    find_library(Metal NAMES Metal)
-    find_library(QuartzCore NAMES QuartzCore)
-    find_library(CoreGraphics NAMES CoreGraphics)
-    find_library(Cocoa NAMES Cocoa)
-    find_library(IOKit NAMES IOKit)
-    find_library(IOSurface NAMES IOSurface)
-
-    list(APPEND APP_LINK_LIBRARIES
-        ${Metal}
-        ${QuartzCore}
-        ${CoreGraphics}
-        ${Cocoa}
-        ${IOKit}
-        ${IOSurface}
-        ${Foundation}
-        ${CoreFoundation}
-    )
-endif()
 
 add_executable(vkpeak vkpeak.cpp)
 
 set_target_properties(vkpeak PROPERTIES CXX_STANDARD 11)
 
-target_link_libraries(vkpeak ${APP_LINK_LIBRARIES})
+target_link_libraries(vkpeak ncnn)

@@ -17,16 +17,15 @@ static const char glsl_p1_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { sfp a_blob_data[]; };
-layout (binding = 1) buffer b_blob { sfp b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { sfp c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { sfp c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    afp a = buffer_ld1(a_blob_data, gx);
-    afp b = buffer_ld1(b_blob_data, gx);
+    afp a = afp(gx);
+    afp b = afp(lx);
 
     afp c = afp(1.f);
 
@@ -50,8 +49,6 @@ void main()
         c = a * c + b;
     }
 
-    buffer_st1(a_blob_data, gx, a);
-    buffer_st1(b_blob_data, gx, b);
     buffer_st1(c_blob_data, gx, c);
 }
 )";
@@ -68,16 +65,15 @@ static const char glsl_p4_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { sfpvec4 a_blob_data[]; };
-layout (binding = 1) buffer b_blob { sfpvec4 b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { sfpvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { sfpvec4 c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    afpvec4 a = buffer_ld4(a_blob_data, gx);
-    afpvec4 b = buffer_ld4(b_blob_data, gx);
+    afpvec4 a = afpvec4(gx);
+    afpvec4 b = afpvec4(lx);
 
     afpvec4 c = afpvec4(1.f);
 
@@ -101,8 +97,6 @@ void main()
         c = a * c + b;
     }
 
-    buffer_st4(a_blob_data, gx, a);
-    buffer_st4(b_blob_data, gx, b);
     buffer_st4(c_blob_data, gx, c);
 }
 )";
@@ -112,16 +106,15 @@ static const char glsl_fp64_p1_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { double a_blob_data[]; };
-layout (binding = 1) buffer b_blob { double b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { double c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { double c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    double a = a_blob_data[gx];
-    double b = b_blob_data[gx];
+    double a = double(gx);
+    double b = double(lx);
 
     double c = double(1.f);
 
@@ -145,8 +138,6 @@ void main()
         c = a * c + b;
     }
 
-    a_blob_data[gx] = a;
-    b_blob_data[gx] = b;
     c_blob_data[gx] = c;
 }
 )";
@@ -156,16 +147,15 @@ static const char glsl_fp64_p4_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { dvec4 a_blob_data[]; };
-layout (binding = 1) buffer b_blob { dvec4 b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { dvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { dvec4 c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    dvec4 a = a_blob_data[gx];
-    dvec4 b = b_blob_data[gx];
+    dvec4 a = dvec4(gx);
+    dvec4 b = dvec4(lx);
 
     dvec4 c = dvec4(1.f);
 
@@ -189,8 +179,6 @@ void main()
         c = a * c + b;
     }
 
-    a_blob_data[gx] = a;
-    b_blob_data[gx] = b;
     c_blob_data[gx] = c;
 }
 )";
@@ -200,16 +188,15 @@ static const char glsl_int32_p1_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { int a_blob_data[]; };
-layout (binding = 1) buffer b_blob { int b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { int c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    int a = a_blob_data[gx];
-    int b = b_blob_data[gx];
+    int a = int(gx);
+    int b = int(lx);
 
     int c = int(1);
 
@@ -233,8 +220,6 @@ void main()
         c = a * c + b;
     }
 
-    a_blob_data[gx] = a;
-    b_blob_data[gx] = b;
     c_blob_data[gx] = c;
 }
 )";
@@ -244,16 +229,15 @@ static const char glsl_int32_p4_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { ivec4 a_blob_data[]; };
-layout (binding = 1) buffer b_blob { ivec4 b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { ivec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { ivec4 c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    ivec4 a = a_blob_data[gx];
-    ivec4 b = b_blob_data[gx];
+    ivec4 a = ivec4(gx);
+    ivec4 b = ivec4(lx);
 
     ivec4 c = ivec4(1);
 
@@ -277,8 +261,6 @@ void main()
         c = a * c + b;
     }
 
-    a_blob_data[gx] = a;
-    b_blob_data[gx] = b;
     c_blob_data[gx] = c;
 }
 )";
@@ -291,16 +273,15 @@ static const char glsl_int16_p1_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { int16_t a_blob_data[]; };
-layout (binding = 1) buffer b_blob { int16_t b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { int16_t c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { int16_t c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    int16_t a = a_blob_data[gx];
-    int16_t b = b_blob_data[gx];
+    int16_t a = int16_t(gx);
+    int16_t b = int16_t(lx);
 
     int16_t c = int16_t(1);
 
@@ -324,8 +305,6 @@ void main()
         c = a * c + b;
     }
 
-    a_blob_data[gx] = a;
-    b_blob_data[gx] = b;
     c_blob_data[gx] = c;
 }
 )";
@@ -338,16 +317,15 @@ static const char glsl_int16_p4_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) buffer a_blob { i16vec4 a_blob_data[]; };
-layout (binding = 1) buffer b_blob { i16vec4 b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { i16vec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { i16vec4 c_blob_data[]; };
 
 void main()
 {
     const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
 
-    i16vec4 a = a_blob_data[gx];
-    i16vec4 b = b_blob_data[gx];
+    i16vec4 a = i16vec4(gx);
+    i16vec4 b = i16vec4(lx);
 
     i16vec4 c = i16vec4(1);
 
@@ -371,8 +349,6 @@ void main()
         c = a * c + b;
     }
 
-    a_blob_data[gx] = a;
-    b_blob_data[gx] = b;
     c_blob_data[gx] = c;
 }
 )";
@@ -388,9 +364,7 @@ static const char glsl_fp16_matrix_nv_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) readonly buffer a_blob { uvec4 a_blob_data[]; };
-layout (binding = 1) readonly buffer b_blob { uvec4 b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
 
 shared uvec4 tmp_a[16*2];
 shared uvec4 tmp_b[16*2];
@@ -402,8 +376,8 @@ void main()
 
     if (lx < 32)
     {
-        tmp_a[lx] = a_blob_data[gx];
-        tmp_b[lx] = b_blob_data[gx];
+        tmp_a[lx] = uvec4(gx);
+        tmp_b[lx] = uvec4(lx);
     }
 
     barrier();
@@ -457,9 +431,7 @@ static const char glsl_fp16_matrix_khr_data[] = R"(
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) readonly buffer a_blob { uvec4 a_blob_data[]; };
-layout (binding = 1) readonly buffer b_blob { uvec4 b_blob_data[]; };
-layout (binding = 2) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
 
 shared uvec4 tmp_a[16*2];
 shared uvec4 tmp_b[16*2];
@@ -471,8 +443,8 @@ void main()
 
     if (lx < 32)
     {
-        tmp_a[lx] = a_blob_data[gx];
-        tmp_b[lx] = b_blob_data[gx];
+        tmp_a[lx] = uvec4(gx);
+        tmp_b[lx] = uvec4(lx);
     }
 
     barrier();
@@ -515,6 +487,74 @@ void main()
 }
 )";
 
+static const char glsl_fp16_matrix_khr_8_8_16_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+shared uvec4 tmp_a[16];
+shared uvec4 tmp_b[16];
+shared uvec4 tmp_c[8];
+
+void main()
+{
+    const int gx = int(gl_GlobalInvocationID.x);
+    const int lx = int(gl_LocalInvocationID.x);
+
+    if (lx < 16)
+    {
+        tmp_a[lx] = uvec4(gx);
+        tmp_b[lx] = uvec4(lx);
+    }
+
+    barrier();
+
+    coopmat<float16_t, gl_ScopeSubgroup, 8, 16, gl_MatrixUseA> a;
+    coopmat<float16_t, gl_ScopeSubgroup, 16, 8, gl_MatrixUseB> b;
+    coopMatLoad(a, tmp_a, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatLoad(b, tmp_b, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
+
+    coopmat<float16_t, gl_ScopeSubgroup, 8, 8, gl_MatrixUseAccumulator> c = coopmat<float16_t, gl_ScopeSubgroup, 8, 8, gl_MatrixUseAccumulator>(0.f);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+    }
+
+    coopMatStore(c, tmp_c, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
+
+    barrier();
+
+    if (lx < 8)
+    {
+        c_blob_data[gx] = tmp_c[lx];
+    }
+}
+)";
+
 static double vkpeak(int device_id, int storage_type, int arithmetic_type, int packing_type)
 {
     ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device(device_id);
@@ -540,7 +580,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
-    if (!vkdev->info.support_cooperative_matrix_16_16_16() && packing_type == 256)
+    if (!vkdev->info.support_cooperative_matrix_16_16_16() && !vkdev->info.support_cooperative_matrix_8_8_16() && packing_type == 256)
     {
         return 0;
     }
@@ -551,7 +591,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         VkPhysicalDevice physicalDevice = vkdev->info.physical_device();
 
         VkPhysicalDeviceFeatures features;
-        vkGetPhysicalDeviceFeatures(physicalDevice, &features);
+        ncnn::vkGetPhysicalDeviceFeatures(physicalDevice, &features);
 
         has_shader_fp64 = features.shaderFloat64;
     }
@@ -570,9 +610,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     ncnn::VkAllocator* allocator = vkdev->acquire_blob_allocator();
 
     // reuse a b c storage, max 1G for each
-    static const int buffer_size = std::min((int)(vkdev->get_heap_budget() / 8), 1 * 1024) * 1024 * 1024;
-    ncnn::VkMat a(buffer_size, (size_t)1u, 1, allocator);
-    ncnn::VkMat b(buffer_size, (size_t)1u, 1, allocator);
+    int buffer_size = std::min((int)(vkdev->get_heap_budget() / 8), 1 * 1024) * 1024 * 1024;
+    if (vkdev->info.type() == 1)
+    {
+        // max 256M for integrated gpu
+        buffer_size = std::min(buffer_size, 256 * 1024 * 1024);
+    }
     ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
 
     int elemsize;
@@ -599,15 +642,23 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         local_size_x = (int)vkdev->info.subgroup_size();
     }
 
-    int invocation_count = buffer_size / (elemsize * packing_type);
+    int max_invocation_count = buffer_size / elemsize;
     if (packing_type == 256)
     {
-        invocation_count = invocation_count * local_size_x;
+        if (vkdev->info.support_cooperative_matrix_16_16_16())
+            max_invocation_count = max_invocation_count / 256 * local_size_x;
+        else // if (vkdev->info.support_cooperative_matrix_8_8_16())
+            max_invocation_count = max_invocation_count / 64 * local_size_x;
+    }
+    else
+    {
+        max_invocation_count /= packing_type;
     }
 
     double max_gflops = 0;
 
-    int loop = 32;
+    int invocation_count = max_invocation_count / 32;
+    int loop = 16;
 
     bool rerun = true;
 
@@ -672,9 +723,13 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 }
                 if (packing_type == 256)
                 {
-                    if (vkdev->info.support_VK_KHR_cooperative_matrix())
+                    if (vkdev->info.support_VK_KHR_cooperative_matrix() && vkdev->info.support_cooperative_matrix_16_16_16())
                     {
                         ncnn::compile_spirv_module(glsl_fp16_matrix_khr_data, sizeof(glsl_fp16_matrix_khr_data) - 1, opt, spirv);
+                    }
+                    else if (vkdev->info.support_VK_KHR_cooperative_matrix() && vkdev->info.support_cooperative_matrix_8_8_16())
+                    {
+                        ncnn::compile_spirv_module(glsl_fp16_matrix_khr_8_8_16_data, sizeof(glsl_fp16_matrix_khr_8_8_16_data) - 1, opt, spirv);
                     }
                     else
                     {
@@ -686,17 +741,15 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             pipeline.create(spirv.data(), spirv.size() * 4, specializations);
         }
 
-        const int cmd_loop = 20;
+        const int cmd_loop = 5;
 
         for (int i = 0; i < cmd_loop; i++)
         {
             // encode command
             ncnn::VkCompute cmd(vkdev);
             {
-                std::vector<ncnn::VkMat> bindings(3);
-                bindings[0] = a;
-                bindings[1] = b;
-                bindings[2] = c;
+                std::vector<ncnn::VkMat> bindings(1);
+                bindings[0] = c;
 
                 std::vector<ncnn::vk_constant_type> constants(0);
 
@@ -720,25 +773,39 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
                 double time = ncnn::get_current_time() - t0;
 
-                if (time < 500)
+                if (time < 1000)
                 {
                     // for fast device
-                    loop *= 2;
+                    if (invocation_count < max_invocation_count)
+                    {
+                        invocation_count = std::min(invocation_count * 2, max_invocation_count);
+                    }
+                    else
+                    {
+                        loop *= 2;
+                    }
                     rerun = true;
                     break;
                 }
 
-                double mac = (double)invocation_count * (double)loop * 16 * packing_type * 2;
+                double mac = (double)invocation_count * (double)loop * 16 * 2;
 
                 if (packing_type == 256)
                 {
-                    mac *= 16;
+                    if (vkdev->info.support_cooperative_matrix_16_16_16())
+                        mac *= 256 * 16;
+                    else // if (vkdev->info.support_cooperative_matrix_8_8_16())
+                        mac *= 64 * 16;
                     mac /= local_size_x;
+                }
+                else
+                {
+                    mac *= packing_type;
                 }
 
                 double gflops = mac / time / 1000000;
 
-                // fprintf(stderr, "%f gflops\n", gflops);
+                fprintf(stderr, "%f gflops\n", gflops);
 
                 if (gflops > max_gflops)
                     max_gflops = gflops;
