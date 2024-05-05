@@ -741,7 +741,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             pipeline.create(spirv.data(), spirv.size() * 4, specializations);
         }
 
-        const int cmd_loop = 5;
+        const int cmd_loop = 10;
 
         for (int i = 0; i < cmd_loop; i++)
         {
