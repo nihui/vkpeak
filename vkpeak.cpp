@@ -72,8 +72,8 @@ void main()
     const int gx = int(gl_GlobalInvocationID.x);
     const int lx = int(gl_LocalInvocationID.x);
 
-    afpvec4 a = afpvec4(gx);
-    afpvec4 b = afpvec4(lx);
+    afpvec4 a = afpvec4(gx) + afpvec4(0,1,2,-3);
+    afpvec4 b = afpvec4(lx) + afpvec4(2,3,5,-7);
 
     afpvec4 c = afpvec4(1.f);
 
@@ -154,8 +154,8 @@ void main()
     const int gx = int(gl_GlobalInvocationID.x);
     const int lx = int(gl_LocalInvocationID.x);
 
-    dvec4 a = dvec4(gx);
-    dvec4 b = dvec4(lx);
+    dvec4 a = dvec4(gx) + dvec4(0,1,2,-3);
+    dvec4 b = dvec4(lx) + dvec4(2,3,5,-7);
 
     dvec4 c = dvec4(1.f);
 
@@ -236,8 +236,8 @@ void main()
     const int gx = int(gl_GlobalInvocationID.x);
     const int lx = int(gl_LocalInvocationID.x);
 
-    ivec4 a = ivec4(gx);
-    ivec4 b = ivec4(lx);
+    ivec4 a = ivec4(gx) + ivec4(0,1,2,-3);
+    ivec4 b = ivec4(lx) + ivec4(2,3,5,-7);
 
     ivec4 c = ivec4(1);
 
@@ -324,8 +324,8 @@ void main()
     const int gx = int(gl_GlobalInvocationID.x);
     const int lx = int(gl_LocalInvocationID.x);
 
-    i16vec4 a = i16vec4(gx);
-    i16vec4 b = i16vec4(lx);
+    i16vec4 a = i16vec4(gx) + i16vec4(0,1,2,-3);
+    i16vec4 b = i16vec4(lx) + i16vec4(2,3,5,-7);
 
     i16vec4 c = i16vec4(1);
 
