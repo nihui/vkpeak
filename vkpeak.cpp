@@ -805,7 +805,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
                 double gflops = mac / time / 1000000;
 
-                fprintf(stderr, "%f gflops\n", gflops);
+                // fprintf(stderr, "%f gflops\n", gflops);
 
                 if (gflops > max_gflops)
                     max_gflops = gflops;
