@@ -773,7 +773,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
                 double time = ncnn::get_current_time() - t0;
 
-                if (time < 1000)
+                if (time < 800)
                 {
                     // for fast device
                     if (invocation_count < max_invocation_count)
