@@ -450,7 +450,7 @@ void main()
     barrier();
 
     coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseA> a;
-    coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseAccumulator> b;
+    coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseB> b;
     coopMatLoad(a, tmp_a, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
     coopMatLoad(b, tmp_b, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
 
@@ -458,22 +458,22 @@ void main()
 
     for (int i = 0; i < loop; i++)
     {
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
-        c = coopMatMulAdd(a, c, b);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
     }
 
     coopMatStore(c, tmp_a, 0, 2, gl_CooperativeMatrixLayoutRowMajor);
