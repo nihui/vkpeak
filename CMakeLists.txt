@@ -137,6 +137,9 @@ option(WITH_LAYER_erf "" OFF)
 option(WITH_LAYER_diag "" OFF)
 option(WITH_LAYER_celu "" OFF)
 option(WITH_LAYER_shrink "" OFF)
+option(WITH_LAYER_rmsnorm "" OFF)
+option(WITH_LAYER_spectrogram "" OFF)
+option(WITH_LAYER_inversespectrogram "" OFF)
 
 add_subdirectory(ncnn)
 
