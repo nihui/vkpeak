@@ -17,6 +17,47 @@ void main()
     const uint gx = gl_GlobalInvocationID.x;
     const uint lx = gl_LocalInvocationID.x;
 
+    afp c = afp(gx);
+
+    afp a = c;
+    afp b = afp(lx);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = sfp(c);
+}
+)";
+
+static const char glsl_p1_dual_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
     afp c0 = afp(gx);
     afp c1 = afp(lx);
 
@@ -45,6 +86,47 @@ void main()
 
     c0 = c0 + c1;
     c_blob_data[gx] = sfp(c0);
+}
+)";
+
+static const char glsl_p4_dual_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    afpvec4 c = afpvec4(gx);
+
+    afpvec4 a = c + afpvec4(0,1,2,-3);
+    afpvec4 b = afpvec4(lx) + afpvec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = sfp((c[0] + c[1]) + (c[2] + c[3]));
 }
 )";
 
@@ -103,6 +185,47 @@ void main()
     const uint gx = gl_GlobalInvocationID.x;
     const uint lx = gl_LocalInvocationID.x;
 
+    double c = double(gx);
+
+    double a = c;
+    double b = double(lx);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_fp64_p1_dual_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { double c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
     double c0 = double(gx);
     double c1 = double(lx);
 
@@ -135,6 +258,47 @@ void main()
 )";
 
 static const char glsl_fp64_p4_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { double c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    dvec4 c = dvec4(gx);
+
+    dvec4 a = c + dvec4(0,1,2,-3);
+    dvec4 b = dvec4(lx) + dvec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = (c[0] + c[1]) + (c[2] + c[3]);
+}
+)";
+
+static const char glsl_fp64_p4_dual_data[] = R"(
 #version 450
 
 layout (constant_id = 0) const int loop = 1;
@@ -189,6 +353,47 @@ void main()
     const uint gx = gl_GlobalInvocationID.x;
     const uint lx = gl_LocalInvocationID.x;
 
+    int c = int(gx);
+
+    int a = c;
+    int b = int(lx);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_int32_p1_dual_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
     int c0 = int(gx);
     int c1 = int(lx);
 
@@ -221,6 +426,47 @@ void main()
 )";
 
 static const char glsl_int32_p4_data[] = R"(
+#version 450
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    ivec4 c = ivec4(gx);
+
+    ivec4 a = c + ivec4(0,1,2,-3);
+    ivec4 b = ivec4(lx) + ivec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = (c[0] + c[1]) + (c[2] + c[3]);
+}
+)";
+
+static const char glsl_int32_p4_dual_data[] = R"(
 #version 450
 
 layout (constant_id = 0) const int loop = 1;
@@ -266,12 +512,54 @@ void main()
 static const char glsl_int16_p1_data[] = R"(
 #version 450
 
-#extension GL_EXT_shader_16bit_storage: require
 #extension GL_EXT_shader_explicit_arithmetic_types_int16: require
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) writeonly buffer c_blob { int16_t c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    int16_t c = int16_t(gx);
+
+    int16_t a = c;
+    int16_t b = int16_t(lx);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = int(c);
+}
+)";
+
+static const char glsl_int16_p1_dual_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int16: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
 
 void main()
 {
@@ -305,19 +593,61 @@ void main()
     }
 
     c0 = c0 + c1;
-    c_blob_data[gx] = c0;
+    c_blob_data[gx] = int(c0);
 }
 )";
 
 static const char glsl_int16_p4_data[] = R"(
 #version 450
 
-#extension GL_EXT_shader_16bit_storage: require
 #extension GL_EXT_shader_explicit_arithmetic_types_int16: require
 
 layout (constant_id = 0) const int loop = 1;
 
-layout (binding = 0) writeonly buffer c_blob { int16_t c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    i16vec4 c = i16vec4(gx);
+
+    i16vec4 a = c + i16vec4(0,1,2,-3);
+    i16vec4 b = i16vec4(lx) + i16vec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = int((c[0] + c[1]) + (c[2] + c[3]));
+}
+)";
+
+static const char glsl_int16_p4_dual_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int16: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
 
 void main()
 {
@@ -351,11 +681,151 @@ void main()
     }
 
     c0 = c0 + c1;
-    c_blob_data[gx] = (c0[0] + c0[1]) + (c0[2] + c0[3]);
+    c_blob_data[gx] = int((c0[0] + c0[1]) + (c0[2] + c0[3]));
+}
+)";
+
+static const char glsl_int8_p4_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int8: require
+#extension GL_EXT_integer_dot_product: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    int c = int(gx);
+
+    i8vec4 a = i8vec4(gx) + i8vec4(0,1,2,-3);
+    i8vec4 b = i8vec4(lx) + i8vec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+        c = dotAccSatEXT(a, b, c);
+    }
+
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_int8_p4_dual_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int8: require
+#extension GL_EXT_integer_dot_product: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    int c0 = int(gx);
+    int c1 = int(lx);
+
+    i8vec4 a = i8vec4(gx) + i8vec4(0,1,2,-3);
+    i8vec4 b = i8vec4(lx) + i8vec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotAccSatEXT(a, b, c0);
+        c1 = dotAccSatEXT(a, b, c1);
+    }
+
+    c0 = c0 + c1;
+    c_blob_data[gx] = c0;
 }
 )";
 
 static const char glsl_fp16_matrix_nv_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_NV_cooperative_matrix: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    fcoopmatNV<16, gl_ScopeSubgroup, M, K> a = fcoopmatNV<16, gl_ScopeSubgroup, M, K>(float(gx));
+    fcoopmatNV<16, gl_ScopeSubgroup, K, N> b = fcoopmatNV<16, gl_ScopeSubgroup, K, N>(float(lx));
+
+    fcoopmatNV<16, gl_ScopeSubgroup, M, N> c = fcoopmatNV<16, gl_ScopeSubgroup, M, N>(float(gx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, c, b);
+    }
+
+    coopMatStoreNV(c, c_blob_data, gx, 0, false);
+}
+)";
+
+static const char glsl_fp16_matrix_dual_nv_data[] = R"(
 #version 450
 
 #extension GL_EXT_shader_16bit_storage: require
@@ -431,6 +901,56 @@ void main()
     coopmat<float16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<float16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(float(gx));
     coopmat<float16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<float16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(float(lx));
 
+    coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+    }
+
+    coopMatStore(c, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
+static const char glsl_fp16_matrix_dual_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    coopmat<float16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<float16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(float(gx));
+    coopmat<float16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<float16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(float(lx));
+
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c0 = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
@@ -459,6 +979,109 @@ void main()
 }
 )";
 
+// 16-16-32
+static const char glsl_int8_matrix_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    coopmat<int8_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<int8_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(int8_t(gx));
+    coopmat<int8_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<int8_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(int8_t(lx));
+
+    coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(int(gx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+    }
+
+    coopMatStore(c, c_blob_data, gx * (M * N), 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
+static const char glsl_int8_matrix_dual_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    coopmat<int8_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<int8_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(int8_t(gx));
+    coopmat<int8_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<int8_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(int8_t(lx));
+
+    coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c0 = coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(int(gx));
+    coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(int(lx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+    }
+
+    c0 = c0 + c1;
+    coopMatStore(c0, c_blob_data, gx * (M * N), 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
 static double vkpeak(int device_id, int storage_type, int arithmetic_type, int packing_type)
 {
     ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device(device_id);
@@ -484,7 +1107,11 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
-    if (!vkdev->info.support_cooperative_matrix_16_16_16() && !vkdev->info.support_cooperative_matrix_8_8_16() && packing_type == 256)
+    if (!vkdev->info.support_int8_arithmetic() && arithmetic_type == 6)
+    {
+        return 0;
+    }
+    if (!vkdev->info.support_cooperative_matrix() && packing_type == 256)
     {
         return 0;
     }
@@ -504,12 +1131,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
     ncnn::VkAllocator* allocator = vkdev->acquire_blob_allocator();
 
-    // reuse c storage, max 1G
-    int buffer_size = std::min((int)(vkdev->get_heap_budget() / 8), 1 * 1024) * 1024 * 1024;
+    // reuse c storage, max 512M
+    int buffer_size = std::min((int)(vkdev->get_heap_budget() / 8), 512) * 1024 * 1024;
     if (vkdev->info.type() == 1)
     {
-        // max 256M for integrated gpu
-        buffer_size = std::min(buffer_size, 256 * 1024 * 1024);
+        // max 128M for integrated gpu
+        buffer_size = std::min(buffer_size, 128 * 1024 * 1024);
     }
     ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
 
@@ -571,18 +1198,28 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             N = 8;
             K = 8;
         }
+
+        if (arithmetic_type == 6)
+        {
+            // HACK
+            M = 16;
+            N = 16;
+            K = 32;
+        }
     }
 
     int max_invocation_count = buffer_size / elemsize;
+    // make max_invocation_count be multiple of local_size_x
+    max_invocation_count = std::max(max_invocation_count / local_size_x, 1) * local_size_x;
     if (packing_type == 256)
     {
-        max_invocation_count = max_invocation_count / (M * N) * local_size_x;
+        max_invocation_count = std::max(max_invocation_count / (M * N), 1);
     }
 
     double max_gflops = 0;
 
     // start with little works
-    int invocation_count = max_invocation_count / 32;
+    int invocation_count = std::max(max_invocation_count / 32, 8);
     int loop = 16;
 
     bool rerun = true;
@@ -594,8 +1231,10 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
         // setup pipeline
         ncnn::Pipeline pipeline(vkdev);
+        ncnn::Pipeline pipeline_dual(vkdev);
         {
             pipeline.set_local_size_xyz(local_size_x, 1, 1);
+            pipeline_dual.set_local_size_xyz(local_size_x, 1, 1);
 
             std::vector<ncnn::vk_specialization_type> specializations(1);
             specializations[0].i = loop;
@@ -603,15 +1242,18 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             // glsl to spirv
             // -1 for omit the tail '\0'
             std::vector<uint32_t> spirv;
+            std::vector<uint32_t> spirv_dual;
             if (arithmetic_type == 2)
             {
                 if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_fp64_p1_data, sizeof(glsl_fp64_p1_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_fp64_p1_dual_data, sizeof(glsl_fp64_p1_dual_data) - 1, opt, spirv_dual);
                 }
                 if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_fp64_p4_data, sizeof(glsl_fp64_p4_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_fp64_p4_dual_data, sizeof(glsl_fp64_p4_dual_data) - 1, opt, spirv_dual);
                 }
             }
             else if (arithmetic_type == 3)
@@ -619,10 +1261,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_int32_p1_data, sizeof(glsl_int32_p1_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int32_p1_dual_data, sizeof(glsl_int32_p1_dual_data) - 1, opt, spirv_dual);
                 }
                 if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_int32_p4_data, sizeof(glsl_int32_p4_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int32_p4_dual_data, sizeof(glsl_int32_p4_dual_data) - 1, opt, spirv_dual);
                 }
             }
             else if (arithmetic_type == 4)
@@ -630,10 +1274,31 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_int16_p1_data, sizeof(glsl_int16_p1_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int16_p1_dual_data, sizeof(glsl_int16_p1_dual_data) - 1, opt, spirv_dual);
                 }
                 if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_int16_p4_data, sizeof(glsl_int16_p4_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int16_p4_dual_data, sizeof(glsl_int16_p4_dual_data) - 1, opt, spirv_dual);
+                }
+            }
+            else if (arithmetic_type == 6)
+            {
+                if (packing_type == 4)
+                {
+                    ncnn::compile_spirv_module(glsl_int8_p4_data, sizeof(glsl_int8_p4_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int8_p4_dual_data, sizeof(glsl_int8_p4_dual_data) - 1, opt, spirv_dual);
+                }
+                if (packing_type == 256)
+                {
+                    // loop M N K
+                    specializations.resize(4);
+                    specializations[1].i = M;
+                    specializations[2].i = N;
+                    specializations[3].i = K;
+
+                    ncnn::compile_spirv_module(glsl_int8_matrix_khr_data, sizeof(glsl_int8_matrix_khr_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int8_matrix_dual_khr_data, sizeof(glsl_int8_matrix_dual_khr_data) - 1, opt, spirv_dual);
                 }
             }
             else // if (arithmetic_type == 0 || arithmetic_type == 1)
@@ -641,10 +1306,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 if (packing_type == 1)
                 {
                     ncnn::compile_spirv_module(glsl_p1_data, sizeof(glsl_p1_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_p1_dual_data, sizeof(glsl_p1_dual_data) - 1, opt, spirv_dual);
                 }
                 if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_p4_data, sizeof(glsl_p4_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_p4_dual_data, sizeof(glsl_p4_dual_data) - 1, opt, spirv_dual);
                 }
                 if (packing_type == 256)
                 {
@@ -657,15 +1324,18 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     if (vkdev->info.support_VK_KHR_cooperative_matrix())
                     {
                         ncnn::compile_spirv_module(glsl_fp16_matrix_khr_data, sizeof(glsl_fp16_matrix_khr_data) - 1, opt, spirv);
+                        ncnn::compile_spirv_module(glsl_fp16_matrix_dual_khr_data, sizeof(glsl_fp16_matrix_dual_khr_data) - 1, opt, spirv_dual);
                     }
                     else
                     {
                         ncnn::compile_spirv_module(glsl_fp16_matrix_nv_data, sizeof(glsl_fp16_matrix_nv_data) - 1, opt, spirv);
+                        ncnn::compile_spirv_module(glsl_fp16_matrix_dual_nv_data, sizeof(glsl_fp16_matrix_dual_nv_data) - 1, opt, spirv_dual);
                     }
                 }
             }
 
             pipeline.create(spirv.data(), spirv.size() * 4, specializations);
+            pipeline_dual.create(spirv_dual.data(), spirv_dual.size() * 4, specializations);
         }
 
         const int cmd_loop = 10;
@@ -674,6 +1344,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         {
             // encode command
             ncnn::VkCompute cmd(vkdev);
+            ncnn::VkCompute cmd_dual(vkdev);
             {
                 std::vector<ncnn::VkMat> bindings(1);
                 bindings[0] = c;
@@ -685,6 +1356,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 dispatcher.h = 1;
                 dispatcher.c = 1;
                 cmd.record_pipeline(&pipeline, bindings, constants, dispatcher);
+                cmd_dual.record_pipeline(&pipeline_dual, bindings, constants, dispatcher);
             }
 
             // time this
@@ -698,12 +1370,24 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     return 0;
                 }
 
-                double time = ncnn::get_current_time() - t0;
+                double t1 = ncnn::get_current_time();
 
-                if (time < 800)
+                ret = cmd_dual.submit_and_wait();
+                if (ret != 0)
+                {
+                    vkdev->reclaim_blob_allocator(allocator);
+                    return 0;
+                }
+
+                double t2 = ncnn::get_current_time();
+
+                double time = t1 - t0;
+                double time_dual = t2 - t1;
+
+                if (time < 800 || time_dual < 800)
                 {
                     // for fast device
-                    if (invocation_count < max_invocation_count)
+                    if (invocation_count * 2 <= max_invocation_count)
                     {
                         invocation_count = std::min(invocation_count * 2, max_invocation_count);
                     }
@@ -715,19 +1399,41 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     break;
                 }
 
-                double mac = (double)invocation_count * ((double)loop * 16 * 2 + 1); // +1 for the tail c0+c1
-
-                if (packing_type == 256)
+                double gflops;
                 {
-                    mac *= (M * N) * 16;
-                    mac /= local_size_x;
+                    double mac = (double)invocation_count * ((double)loop * 16 * 2);
+
+                    if (packing_type == 256)
+                    {
+                        mac *= M * N * K;
+                        mac /= local_size_x;
+                    }
+                    else
+                    {
+                        mac *= packing_type;
+                    }
+
+                    gflops = mac / time / 1000000;
                 }
-                else
+                double gflops_dual;
                 {
-                    mac *= packing_type;
+                    // dual issue is faster
+                    double mac = (double)invocation_count * ((double)loop * 16 * 2 + 1); // +1 for the tail c0+c1
+
+                    if (packing_type == 256)
+                    {
+                        mac *= M * N * K;
+                        mac /= local_size_x;
+                    }
+                    else
+                    {
+                        mac *= packing_type;
+                    }
+
+                    gflops_dual = mac / time_dual / 1000000;
                 }
 
-                double gflops = mac / time / 1000000;
+                gflops = std::max(gflops, gflops_dual);
 
                 // fprintf(stderr, "%f gflops\n", gflops);
 
@@ -777,7 +1483,7 @@ int main(int argc, char** argv)
 
     // device_id        = 0
     // storage_type     = 0/1/2/3/4/5/6 = fp32 fp16 fp64 int32 int16 int8 bf16
-    // arithmetic_type  = 0/1/2/3/4     = fp32 fp16 fp64 int32 int16
+    // arithmetic_type  = 0/1/2/3/4/5/6 = fp32 fp16 fp64 int32 int16 int8 bf16
     // packing_type     = 1/4/256       = scalar vec4 matrix
 
     fprintf(stderr, "\n");
@@ -798,8 +1504,12 @@ int main(int argc, char** argv)
     fprintf(stderr, "int32-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 4));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "int16-scalar = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 1));
-    fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 4, 4, 4));
+    fprintf(stderr, "int16-scalar = %.2f GIOPS\n", vkpeak(device_id, 3, 4, 1));
+    fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 4, 4));
+
+    fprintf(stderr, "\n");
+    fprintf(stderr, "int8-dotprod = %.2f GIOPS\n", vkpeak(device_id, 3, 6, 4));
+    fprintf(stderr, "int8-matrix  = %.2f GIOPS\n", vkpeak(device_id, 3, 6, 256));
 
     ncnn::destroy_gpu_instance();
 
