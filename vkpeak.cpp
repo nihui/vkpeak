@@ -775,6 +775,96 @@ void main()
 }
 )";
 
+static const char glsl_bf16_p4_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types : require
+#extension GL_EXT_bfloat16: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    float c = float(gx);
+
+    bf16vec4 a = bf16vec4(bfloat16_t(gx + vec4(0,1,2,-3)));
+    bf16vec4 b = bf16vec4(bfloat16_t(lx + vec4(2,3,5,-7)));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+        c = float(dot(a, b)) + c;
+    }
+
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_bf16_p4_dual_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types : require
+#extension GL_EXT_bfloat16: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    float c0 = float(gx);
+    float c1 = float(lx);
+
+    bf16vec4 a = bf16vec4(bfloat16_t(gx + vec4(0,1,2,-3)));
+    bf16vec4 b = bf16vec4(bfloat16_t(lx + vec4(2,3,5,-7)));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+        c0 = float(dot(a, b)) + c0;
+        c1 = float(dot(a, b)) + c1;
+    }
+
+    c0 = c0 + c1;
+    c_blob_data[gx] = c0;
+}
+)";
+
 static const char glsl_fp16_matrix_nv_data[] = R"(
 #version 450
 
@@ -1275,6 +1365,213 @@ void main()
 }
 )";
 
+static const char glsl_bf16_matrix_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+#extension GL_EXT_bfloat16: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(float(gx));
+    coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(float(lx));
+
+    coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+    }
+
+    coopMatStore(c, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
+static const char glsl_bf16_matrix_dual_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+#extension GL_EXT_bfloat16: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(float(gx));
+    coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(float(lx));
+
+    coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c0 = coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
+    coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+    }
+
+    coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c2 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(c0);
+    coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c3 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(c1);
+
+    c0 = coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(c2 + c3);
+    coopMatStore(c0, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
+static const char glsl_bf16_fp32_matrix_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+#extension GL_EXT_bfloat16: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(float(gx));
+    coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(float(lx));
+
+    coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+        c = coopMatMulAdd(a, b, c);
+    }
+
+    coopMatStore(c, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
+static const char glsl_bf16_fp32_matrix_dual_khr_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+#extension GL_EXT_bfloat16: require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA> a = coopmat<bfloat16_t, gl_ScopeSubgroup, M, K, gl_MatrixUseA>(float(gx));
+    coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB> b = coopmat<bfloat16_t, gl_ScopeSubgroup, K, N, gl_MatrixUseB>(float(lx));
+
+    coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c0 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
+    coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+        c0 = coopMatMulAdd(a, b, c0);
+        c1 = coopMatMulAdd(a, b, c1);
+    }
+
+    c0 = c0 + c1;
+    coopMatStore(c0, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
 static double vkpeak(int device_id, int storage_type, int arithmetic_type, int packing_type)
 {
     ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device(device_id);
@@ -1304,6 +1601,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
+    // TODO check arithmetic_type == 6 for bf16
     if (!vkdev->info.support_cooperative_matrix() && packing_type == 256)
     {
         return 0;
@@ -1366,6 +1664,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     int N = 1;
     int K = 1;
     bool use_fp16_fp32_matrix = false;
+    bool use_bf16_fp32_matrix = false;
     if (packing_type == 256)
     {
         bool mnk_found = false;
@@ -1508,6 +1807,60 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
         }
 
+        if (arithmetic_type == 6)
+        {
+            if (vkdev->info.support_VK_KHR_cooperative_matrix())
+            {
+                const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = vkdev->info.queryCooperativeMatrixProperties();
+
+                {
+                    // find bf16 * bf16 => bf16
+                    for (uint32_t j = 0; j < properties.size(); j++)
+                    {
+                        const VkCooperativeMatrixPropertiesKHR& cmp = properties[j];
+
+                        if (cmp.AType == VK_COMPONENT_TYPE_BFLOAT16_KHR && cmp.BType == VK_COMPONENT_TYPE_BFLOAT16_KHR
+                            && cmp.CType == VK_COMPONENT_TYPE_BFLOAT16_KHR && cmp.ResultType == VK_COMPONENT_TYPE_BFLOAT16_KHR
+                            && cmp.scope == VK_SCOPE_SUBGROUP_KHR)
+                        {
+                            M = cmp.MSize;
+                            N = cmp.NSize;
+                            K = cmp.KSize;
+                            mnk_found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!mnk_found)
+                {
+                    // find bf16 * bf16 => fp32
+                    for (uint32_t j = 0; j < properties.size(); j++)
+                    {
+                        const VkCooperativeMatrixPropertiesKHR& cmp = properties[j];
+
+                        if (cmp.AType == VK_COMPONENT_TYPE_BFLOAT16_KHR && cmp.BType == VK_COMPONENT_TYPE_BFLOAT16_KHR
+                            && cmp.CType == VK_COMPONENT_TYPE_FLOAT32_KHR && cmp.ResultType == VK_COMPONENT_TYPE_FLOAT32_KHR
+                            && cmp.scope == VK_SCOPE_SUBGROUP_KHR)
+                        {
+                            M = cmp.MSize;
+                            N = cmp.NSize;
+                            K = cmp.KSize;
+                            mnk_found = true;
+                            use_bf16_fp32_matrix = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // HACK
+            M = 16;
+            N = 16;
+            K = 16;
+            mnk_found = true;
+        }
+
         if (!mnk_found)
         {
             // no supported component type
@@ -1606,6 +1959,33 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
                     ncnn::compile_spirv_module(glsl_int8_matrix_khr_data, sizeof(glsl_int8_matrix_khr_data) - 1, opt, spirv);
                     ncnn::compile_spirv_module(glsl_int8_matrix_dual_khr_data, sizeof(glsl_int8_matrix_dual_khr_data) - 1, opt, spirv_dual);
+                }
+            }
+            else if (arithmetic_type == 6)
+            {
+                if (packing_type == 4)
+                {
+                    ncnn::compile_spirv_module(glsl_bf16_p4_data, sizeof(glsl_bf16_p4_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_bf16_p4_dual_data, sizeof(glsl_bf16_p4_dual_data) - 1, opt, spirv_dual);
+                }
+                if (packing_type == 256)
+                {
+                    // loop M N K
+                    specializations.resize(4);
+                    specializations[1].i = M;
+                    specializations[2].i = N;
+                    specializations[3].i = K;
+
+                    if (use_bf16_fp32_matrix)
+                    {
+                        ncnn::compile_spirv_module(glsl_bf16_fp32_matrix_khr_data, sizeof(glsl_bf16_fp32_matrix_khr_data) - 1, opt, spirv);
+                        ncnn::compile_spirv_module(glsl_bf16_fp32_matrix_dual_khr_data, sizeof(glsl_bf16_fp32_matrix_dual_khr_data) - 1, opt, spirv_dual);
+                    }
+                    else
+                    {
+                        ncnn::compile_spirv_module(glsl_bf16_matrix_khr_data, sizeof(glsl_bf16_matrix_khr_data) - 1, opt, spirv);
+                        ncnn::compile_spirv_module(glsl_bf16_matrix_dual_khr_data, sizeof(glsl_bf16_matrix_dual_khr_data) - 1, opt, spirv_dual);
+                    }
                 }
             }
             else // if (arithmetic_type == 0 || arithmetic_type == 1)
@@ -1834,9 +2214,9 @@ int main(int argc, char** argv)
     fprintf(stderr, "int8-dotprod = %.2f GIOPS\n", vkpeak(device_id, 3, 5, 4));
     fprintf(stderr, "int8-matrix  = %.2f GIOPS\n", vkpeak(device_id, 3, 5, 256));
 
-    // fprintf(stderr, "\n");
-    // fprintf(stderr, "bf16-dotprod = %.2f GFLOPS\n", vkpeak(device_id, 3, 6, 4));
-    // fprintf(stderr, "bf16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 3, 6, 256));
+    fprintf(stderr, "\n");
+    fprintf(stderr, "bf16-dotprod = %.2f GFLOPS\n", vkpeak(device_id, 0, 6, 4));
+    fprintf(stderr, "bf16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 0, 6, 256));
 
     ncnn::destroy_gpu_instance();
 
