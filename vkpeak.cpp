@@ -892,22 +892,22 @@ void main()
 
     for (int i = 0; i < loop; i++)
     {
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
     }
 
     coopMatStoreNV(c, c_blob_data, gx, 0, false);
@@ -942,22 +942,22 @@ void main()
 
     for (int i = 0; i < loop; i++)
     {
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
     }
 
     c0 = c0 + c1;
@@ -1092,22 +1092,22 @@ void main()
 
     for (int i = 0; i < loop; i++)
     {
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
-        c = coopMatMulAddNV(a, c, b);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
     }
 
     coopMatStoreNV(c, c_blob_data, gx, 0, false);
@@ -1142,22 +1142,22 @@ void main()
 
     for (int i = 0; i < loop; i++)
     {
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
-        c0 = coopMatMulAddNV(a, c0, b);
-        c1 = coopMatMulAddNV(a, c1, b);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
     }
 
     c0 = c0 + c1;
@@ -1262,6 +1262,108 @@ void main()
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+}
+)";
+
+static const char glsl_int8_matrix_nv_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int8: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_NV_cooperative_matrix: require
+#extension GL_NV_integer_cooperative_matrix : require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    icoopmatNV<8, gl_ScopeSubgroup, M, K> a = icoopmatNV<8, gl_ScopeSubgroup, M, K>(int8_t(gx));
+    icoopmatNV<8, gl_ScopeSubgroup, K, N> b = icoopmatNV<8, gl_ScopeSubgroup, K, N>(int8_t(lx));
+
+    icoopmatNV<32, gl_ScopeSubgroup, M, N> c = icoopmatNV<32, gl_ScopeSubgroup, M, N>(int(gx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+        c = coopMatMulAddNV(a, b, c);
+    }
+
+    coopMatStoreNV(c, c_blob_data, gx * (M * N), 0, false);
+}
+)";
+
+static const char glsl_int8_matrix_dual_nv_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int8: require
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_NV_cooperative_matrix: require
+#extension GL_NV_integer_cooperative_matrix : require
+
+layout (constant_id = 0) const int loop = 1;
+layout (constant_id = 1) const int M = 1;
+layout (constant_id = 2) const int N = 1;
+layout (constant_id = 3) const int K = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    icoopmatNV<8, gl_ScopeSubgroup, M, K> a = icoopmatNV<8, gl_ScopeSubgroup, M, K>(int8_t(gx));
+    icoopmatNV<8, gl_ScopeSubgroup, K, N> b = icoopmatNV<8, gl_ScopeSubgroup, K, N>(int8_t(lx));
+
+    icoopmatNV<32, gl_ScopeSubgroup, M, N> c0 = icoopmatNV<32, gl_ScopeSubgroup, M, N>(int(gx));
+    icoopmatNV<32, gl_ScopeSubgroup, M, N> c1 = icoopmatNV<32, gl_ScopeSubgroup, M, N>(int(lx));
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+        c0 = coopMatMulAddNV(a, b, c0);
+        c1 = coopMatMulAddNV(a, b, c1);
+    }
+
+    c0 = c0 + c1;
+    coopMatStoreNV(c0, c_blob_data, gx * (M * N), 0, false);
 }
 )";
 
@@ -1957,8 +2059,16 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     specializations[2].i = N;
                     specializations[3].i = K;
 
-                    ncnn::compile_spirv_module(glsl_int8_matrix_khr_data, sizeof(glsl_int8_matrix_khr_data) - 1, opt, spirv);
-                    ncnn::compile_spirv_module(glsl_int8_matrix_dual_khr_data, sizeof(glsl_int8_matrix_dual_khr_data) - 1, opt, spirv_dual);
+                    if (vkdev->info.support_VK_KHR_cooperative_matrix())
+                    {
+                        ncnn::compile_spirv_module(glsl_int8_matrix_khr_data, sizeof(glsl_int8_matrix_khr_data) - 1, opt, spirv);
+                        ncnn::compile_spirv_module(glsl_int8_matrix_dual_khr_data, sizeof(glsl_int8_matrix_dual_khr_data) - 1, opt, spirv_dual);
+                    }
+                    else
+                    {
+                        ncnn::compile_spirv_module(glsl_int8_matrix_nv_data, sizeof(glsl_int8_matrix_nv_data) - 1, opt, spirv);
+                        ncnn::compile_spirv_module(glsl_int8_matrix_dual_nv_data, sizeof(glsl_int8_matrix_dual_nv_data) - 1, opt, spirv_dual);
+                    }
                 }
             }
             else if (arithmetic_type == 6)
