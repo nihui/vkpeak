@@ -688,7 +688,6 @@ void main()
 static const char glsl_int8_p4_data[] = R"(
 #version 450
 
-#extension GL_EXT_shader_explicit_arithmetic_types_int8: require
 #extension GL_EXT_integer_dot_product: require
 
 layout (constant_id = 0) const int loop = 1;
@@ -702,27 +701,27 @@ void main()
 
     int c = int(gx);
 
-    i8vec4 a = i8vec4(gx) + i8vec4(0,1,2,-3);
-    i8vec4 b = i8vec4(lx) + i8vec4(2,3,5,-7);
+    int a = int(gx);
+    int b = int(lx);
 
     for (int i = 0; i < loop; i++)
     {
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
-        c = dotAccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
+        c = dotPacked4x8AccSatEXT(a, b, c);
     }
 
     c_blob_data[gx] = c;
@@ -732,7 +731,6 @@ void main()
 static const char glsl_int8_p4_dual_data[] = R"(
 #version 450
 
-#extension GL_EXT_shader_explicit_arithmetic_types_int8: require
 #extension GL_EXT_integer_dot_product: require
 
 layout (constant_id = 0) const int loop = 1;
@@ -747,27 +745,27 @@ void main()
     int c0 = int(gx);
     int c1 = int(lx);
 
-    i8vec4 a = i8vec4(gx) + i8vec4(0,1,2,-3);
-    i8vec4 b = i8vec4(lx) + i8vec4(2,3,5,-7);
+    int a = int(gx);
+    int b = int(lx);
 
     for (int i = 0; i < loop; i++)
     {
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
-        c0 = dotAccSatEXT(a, b, c0);
-        c1 = dotAccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
+        c0 = dotPacked4x8AccSatEXT(a, b, c0);
+        c1 = dotPacked4x8AccSatEXT(a, b, c1);
     }
 
     c0 = c0 + c1;
