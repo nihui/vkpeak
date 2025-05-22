@@ -790,32 +790,48 @@ void main()
     const uint gx = gl_GlobalInvocationID.x;
     const uint lx = gl_LocalInvocationID.x;
 
-    float c = float(gx);
+    bfloat16_t c = bfloat16_t(gx);
 
-    bf16vec4 a = bf16vec4(bfloat16_t(gx + vec4(0,1,2,-3)));
-    bf16vec4 b = bf16vec4(bfloat16_t(lx + vec4(2,3,5,-7)));
+    u16vec4 a = uint16_t(gx) + u16vec4(0,1,2,3);
+    bf16vec4 b = uintBitsToBFloat16EXT(uint16_t(lx) + u16vec4(2,3,5,7));
 
     for (int i = 0; i < loop; i++)
     {
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
-        c = float(dot(a, b)) + c;
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.x = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.y = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.z = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.w = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.x = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.y = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.z = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.w = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.x = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.y = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.z = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.w = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.x = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.y = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.z = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b);
+        a.w = bfloat16BitsToUintEXT(c);
     }
 
-    c_blob_data[gx] = c;
+    c_blob_data[gx] = float(c);
 }
 )";
 
@@ -834,34 +850,50 @@ void main()
     const uint gx = gl_GlobalInvocationID.x;
     const uint lx = gl_LocalInvocationID.x;
 
-    float c0 = float(gx);
-    float c1 = float(lx);
+    bfloat16_t c0 = bfloat16_t(gx);
+    bfloat16_t c1 = bfloat16_t(lx);
 
-    bf16vec4 a = bf16vec4(bfloat16_t(gx + vec4(0,1,2,-3)));
-    bf16vec4 b = bf16vec4(bfloat16_t(lx + vec4(2,3,5,-7)));
+    u16vec4 a0 = uint16_t(gx) + u16vec4(0,1,2,3);
+    u16vec4 a1 = uint16_t(gx) + u16vec4(10,21,32,43);
+    bf16vec4 b = uintBitsToBFloat16EXT(uint16_t(lx) + u16vec4(2,3,5,7));
 
     for (int i = 0; i < loop; i++)
     {
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
-        c0 = float(dot(a, b)) + c0;
-        c1 = float(dot(a, b)) + c1;
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.x = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.y = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.z = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.w = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.x = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.y = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.z = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.w = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.x = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.y = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.z = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.w = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.x = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.y = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b);
+        a0.z = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b);
+        a1.w = bfloat16BitsToUintEXT(c1);
     }
 
-    c0 = c0 + c1;
-    c_blob_data[gx] = c0;
+    c_blob_data[gx] = float(c0) + float(c1);
 }
 )";
 
