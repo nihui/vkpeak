@@ -1733,7 +1733,6 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
-    // TODO check arithmetic_type == 6 for bf16
     if (!vkdev->info.support_cooperative_matrix() && packing_type == 256)
     {
         return 0;
@@ -1742,6 +1741,34 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     // check shader fp64 feature
     bool has_shader_fp64 = vkdev->info.physicalDevicefeatures().shaderFloat64;
     if (!has_shader_fp64 && (storage_type == 2 || arithmetic_type == 2))
+    {
+        return 0;
+    }
+
+    // check shader int8 dotprod feature
+    bool has_shader_int8_dotprod = vkdev->info.queryShaderIntegerDotProductFeatures().shaderIntegerDotProduct;
+    if (!has_shader_int8_dotprod && (arithmetic_type == 5 && packing_type == 4))
+    {
+        return 0;
+    }
+
+    // check shader bf16 feature
+    bool has_shader_bf16 = vkdev->info.queryShaderBfloat16Features().shaderBFloat16Type;
+    if (!has_shader_bf16 && (arithmetic_type == 6))
+    {
+        return 0;
+    }
+
+    // check shader bf16 dotprod feature
+    bool has_shader_bf16_dotprod = vkdev->info.queryShaderBfloat16Features().shaderBFloat16DotProduct;
+    if (!has_shader_bf16_dotprod && (arithmetic_type == 6 && packing_type == 4))
+    {
+        return 0;
+    }
+
+    // check shader bf16 cooperative matrix feature
+    bool has_shader_bf16_matrix = vkdev->info.queryShaderBfloat16Features().shaderBFloat16CooperativeMatrix;
+    if (!has_shader_bf16_matrix && (arithmetic_type == 6 && packing_type == 256))
     {
         return 0;
     }
@@ -2177,8 +2204,13 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                 }
             }
 
-            pipeline.create(spirv.data(), spirv.size() * 4, specializations);
-            pipeline_dual.create(spirv_dual.data(), spirv_dual.size() * 4, specializations);
+            int ret0 = pipeline.create(spirv.data(), spirv.size() * 4, specializations);
+            int ret1 = pipeline_dual.create(spirv_dual.data(), spirv_dual.size() * 4, specializations);
+            if (ret0 != 0 || ret1 != 0)
+            {
+                vkdev->reclaim_blob_allocator(allocator);
+                return 0;
+            }
         }
 
         const int cmd_loop = 10;
@@ -2327,7 +2359,7 @@ int main(int argc, char** argv)
     // device_id        = 0
     // storage_type     = 0/1/2/3/4/5/6 = fp32 fp16 fp64 int32 int16 int8 bf16
     // arithmetic_type  = 0/1/2/3/4/5/6 = fp32 fp16 fp64 int32 int16 int8 bf16
-    // packing_type     = 1/4/256       = scalar vec4 matrix
+    // packing_type     = 1/4/256       = scalar vec4/dotprod matrix
 
     fprintf(stderr, "\n");
     fprintf(stderr, "fp32-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 1));
