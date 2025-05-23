@@ -2012,12 +2012,6 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     }
                 }
             }
-
-            // HACK
-            M = 16;
-            N = 16;
-            K = 16;
-            mnk_found = true;
         }
 
         if (!mnk_found)
