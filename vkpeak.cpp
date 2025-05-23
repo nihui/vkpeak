@@ -908,7 +908,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -940,7 +940,7 @@ void main()
         c = coopMatMulAddNV(a, b, c);
     }
 
-    coopMatStoreNV(c, c_blob_data, gx, 0, false);
+    coopMatStoreNV(c, c_blob_data, gx * (M * N) / 2, N / 2, false);
 }
 )";
 
@@ -957,7 +957,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -991,7 +991,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStoreNV(c0, c_blob_data, gx, 0, false);
+    coopMatStoreNV(c, c_blob_data, gx * (M * N) / 2, N / 2, false);
 }
 )";
 
@@ -1008,7 +1008,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1040,7 +1040,7 @@ void main()
         c = coopMatMulAdd(a, b, c);
     }
 
-    coopMatStore(c, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c, c_blob_data, gx * (M * N) / 2, N / 2, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1057,7 +1057,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1091,7 +1091,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStore(c0, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c0, c_blob_data, gx * (M * N) / 2, N / 2, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1108,7 +1108,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1140,7 +1140,7 @@ void main()
         c = coopMatMulAddNV(a, b, c);
     }
 
-    coopMatStoreNV(c, c_blob_data, gx, 0, false);
+    coopMatStoreNV(c, c_blob_data, gx * (M * N), N, false);
 }
 )";
 
@@ -1157,7 +1157,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1191,7 +1191,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStoreNV(c0, c_blob_data, gx, 0, false);
+    coopMatStoreNV(c0, c_blob_data, gx * (M * N), N, false);
 }
 )";
 
@@ -1208,7 +1208,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1240,7 +1240,7 @@ void main()
         c = coopMatMulAdd(a, b, c);
     }
 
-    coopMatStore(c, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1257,7 +1257,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1291,7 +1291,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStore(c0, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1341,7 +1341,7 @@ void main()
         c = coopMatMulAddNV(a, b, c);
     }
 
-    coopMatStoreNV(c, c_blob_data, gx * (M * N), 0, false);
+    coopMatStoreNV(c, c_blob_data, gx * (M * N), N, false);
 }
 )";
 
@@ -1393,7 +1393,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStoreNV(c0, c_blob_data, gx * (M * N), 0, false);
+    coopMatStoreNV(c0, c_blob_data, gx * (M * N), N, false);
 }
 )";
 
@@ -1442,7 +1442,7 @@ void main()
         c = coopMatMulAdd(a, b, c);
     }
 
-    coopMatStore(c, c_blob_data, gx * (M * N), 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1493,7 +1493,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStore(c0, c_blob_data, gx * (M * N), 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1511,7 +1511,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1543,7 +1543,7 @@ void main()
         c = coopMatMulAdd(a, b, c);
     }
 
-    coopMatStore(c, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c, c_blob_data, gx * (M * N) / 2, N / 2, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1561,7 +1561,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1598,7 +1598,7 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c3 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(c1);
 
     c0 = coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(c2 + c3);
-    coopMatStore(c0, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c0, c_blob_data, gx * (M * N) / 2, N / 2, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1616,7 +1616,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1648,7 +1648,7 @@ void main()
         c = coopMatMulAdd(a, b, c);
     }
 
-    coopMatStore(c, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
@@ -1666,7 +1666,7 @@ layout (constant_id = 1) const int M = 1;
 layout (constant_id = 2) const int N = 1;
 layout (constant_id = 3) const int K = 1;
 
-layout (binding = 0) writeonly buffer c_blob { uvec4 c_blob_data[]; };
+layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
 
 void main()
 {
@@ -1700,7 +1700,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStore(c0, c_blob_data, gx, 0, gl_CooperativeMatrixLayoutRowMajor);
+    coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
