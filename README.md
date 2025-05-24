@@ -6,7 +6,7 @@ A synthetic benchmarking tool to measure peak capabilities of vulkan devices. It
 
 ## [Download](https://github.com/nihui/vkpeak/releases)
 
-Download Windows/Linux/MacOS Executable for Intel/AMD/Nvidia GPU
+Download Windows/Linux/MacOS Executable for Intel/AMD/Nvidia/Apple GPU
 
 **https://github.com/nihui/vkpeak/releases**
 
@@ -26,19 +26,7 @@ If you encounter a crash or error, try upgrading your GPU driver:
 
 ## Build from Source
 
-1. Download and setup the Vulkan SDK from https://vulkan.lunarg.com/
-  - For Linux distributions, you can either get the essential build requirements from package manager
-```shell
-dnf install vulkan-headers vulkan-loader-devel
-```
-```shell
-apt-get install libvulkan-dev
-```
-```shell
-pacman -S vulkan-headers vulkan-icd-loader
-```
-
-2. Clone this project with all submodules
+1. Clone this project with all submodules
 
 ```shell
 git clone https://github.com/nihui/vkpeak.git
@@ -46,8 +34,8 @@ cd vkpeak
 git submodule update --init --recursive
 ```
 
-3. Build with CMake
-  - You can pass -DUSE_STATIC_MOLTENVK=ON option to avoid linking the vulkan loader library on MacOS
+2. Build with CMake
+  - You can pass -DVulkan_LIBRARY=<path to your macOS/lib/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a> option to link static MoltenVK library on MacOS, MoltenVK is part of Vulkan SDK from https://vulkan.lunarg.com/
 
 ```shell
 mkdir build
