@@ -2026,7 +2026,10 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     max_invocation_count = std::max(max_invocation_count / local_size_x, 1) * local_size_x;
     if (packing_type == 256)
     {
-        max_invocation_count = std::max(max_invocation_count / (M * N), 1);
+        if (use_fp16_fp32_matrix || use_bf16_fp32_matrix)
+            max_invocation_count = std::max(max_invocation_count / (M * N) / 2, 1);
+        else
+            max_invocation_count = std::max(max_invocation_count / (M * N), 1);
     }
 
     double max_gflops = 0;
