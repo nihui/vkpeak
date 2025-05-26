@@ -991,7 +991,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    coopMatStoreNV(c, c_blob_data, gx * (M * N) / 2, N / 2, false);
+    coopMatStoreNV(c0, c_blob_data, gx * (M * N) / 2, N / 2, false);
 }
 )";
 
