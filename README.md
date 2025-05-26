@@ -47,43 +47,57 @@ cmake --build . -j 4
 ## Sample
 
 ```
-[nihui@nihui-pc build]$ ./vkpeak 0
-device       = GeForce RTX 2070
+[nihui@nihui-pc build]$ ./vkpeak 1
+device       = NVIDIA GeForce RTX 3060
 
-fp32-scalar  = 8536.18 GFLOPS
-fp32-vec4    = 8473.82 GFLOPS
+fp32-scalar  = 9362.42 GFLOPS
+fp32-vec4    = 11124.36 GFLOPS
 
-fp16-scalar  = 8405.30 GFLOPS
-fp16-vec4    = 16261.30 GFLOPS
+fp16-scalar  = 13938.83 GFLOPS
+fp16-vec4    = 10362.61 GFLOPS
+fp16-matrix  = 56050.63 GFLOPS
 
-fp64-scalar  = 262.86 GFLOPS
-fp64-vec4    = 262.86 GFLOPS
+fp64-scalar  = 219.45 GFLOPS
+fp64-vec4    = 218.21 GFLOPS
 
-int32-scalar = 8363.63 GIOPS
-int32-vec4   = 8313.07 GIOPS
+int32-scalar = 7023.06 GIOPS
+int32-vec4   = 7020.55 GIOPS
 
-int16-scalar = 5518.05 GIOPS
-int16-vec4   = 7138.91 GIOPS
+int16-scalar = 5500.50 GIOPS
+int16-vec4   = 5827.67 GIOPS
+
+int8-dotprod = 6691.18 GIOPS
+int8-matrix  = 110374.23 GIOPS
+
+bf16-dotprod = 0.00 GFLOPS
+bf16-matrix  = 0.00 GFLOPS
 ```
 
 ```
-nihui@nihui-macbook-air vkpeak-20210424-macos % ./vkpeak 0 
+nihui@nihui-macbook-air build % ./vkpeak 0 
 device       = Apple M1
 
-fp32-scalar  = 2093.55 GFLOPS
-fp32-vec4    = 2369.02 GFLOPS
+fp32-scalar  = 2092.68 GFLOPS
+fp32-vec4    = 2381.70 GFLOPS
 
-fp16-scalar  = 2195.79 GFLOPS
-fp16-vec4    = 2513.04 GFLOPS
+fp16-scalar  = 2198.92 GFLOPS
+fp16-vec4    = 2495.72 GFLOPS
+fp16-matrix  = 0.00 GFLOPS
 
 fp64-scalar  = 0.00 GFLOPS
 fp64-vec4    = 0.00 GFLOPS
 
-int32-scalar = 653.38 GIOPS
-int32-vec4   = 649.56 GIOPS
+int32-scalar = 651.10 GIOPS
+int32-vec4   = 651.95 GIOPS
 
-int16-scalar = 653.42 GIOPS
-int16-vec4   = 652.94 GIOPS
+int16-scalar = 647.64 GIOPS
+int16-vec4   = 653.83 GIOPS
+
+int8-dotprod = 8821.90 GIOPS
+int8-matrix  = 0.00 GIOPS
+
+bf16-dotprod = 0.00 GFLOPS
+bf16-matrix  = 0.00 GFLOPS
 ```
 
 ## Other Open-Source Code Used
