@@ -5,7 +5,9 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 project(vkpeak)
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_BUILD_TYPE release)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE release CACHE STRING "Choose the type of build" FORCE)
+endif()
 
 # build ncnn library
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ncnn/CMakeLists.txt")
@@ -137,6 +139,9 @@ option(WITH_LAYER_erf "" OFF)
 option(WITH_LAYER_diag "" OFF)
 option(WITH_LAYER_celu "" OFF)
 option(WITH_LAYER_shrink "" OFF)
+option(WITH_LAYER_rmsnorm "" OFF)
+option(WITH_LAYER_spectrogram "" OFF)
+option(WITH_LAYER_inversespectrogram "" OFF)
 
 add_subdirectory(ncnn)
 
