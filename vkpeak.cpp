@@ -1,5 +1,16 @@
 // vkpeak implemented with ncnn library
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+#include <io.h>
+#define IS_TERMINAL() _isatty(_fileno(stdin))
+#else
+#include <unistd.h>
+#define IS_TERMINAL() isatty(STDIN_FILENO)
+#endif
+
 #include <benchmark.h>
 #include <command.h>
 #include <gpu.h>
@@ -2322,7 +2333,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
 int main(int argc, char** argv)
 {
-    if (argc != 2)
+    if (argc != 1 && argc != 2)
     {
         fprintf(stderr, "Usage: %s [device_id]\n", argv[0]);
         return -1;
@@ -2337,7 +2348,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    const int device_id = atoi(argv[1]);
+    const int device_id = argc == 2 ? atoi(argv[1]) : ncnn::get_default_gpu_index();
     if (device_id < 0 || device_id >= gpu_count)
     {
         fprintf(stderr, "No vulkan device for %d\n", device_id);
@@ -2349,6 +2360,18 @@ int main(int argc, char** argv)
         }
 
         return -1;
+    }
+
+    if (argc == 1)
+    {
+        fprintf(stderr, "Available devices:\n");
+
+        for (int i = 0; i < gpu_count; i++)
+        {
+            fprintf(stderr, "%d = %s\n", i, ncnn::get_gpu_info(i).device_name());
+        }
+
+        fprintf(stderr, "Device %d will be used\n\n", device_id);
     }
 
     fprintf(stderr, "device       = %s\n", ncnn::get_gpu_info(device_id).device_name());
@@ -2388,6 +2411,12 @@ int main(int argc, char** argv)
     fprintf(stderr, "bf16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 0, 6, 256));
 
     ncnn::destroy_gpu_instance();
+
+    if (!IS_TERMINAL())
+    {
+        fprintf(stderr, "\nPress any key to continue...\n");
+        getchar();
+    }
 
     return 0;
 }
