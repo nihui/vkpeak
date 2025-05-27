@@ -7,6 +7,8 @@
 #include <conio.h>
 #include <io.h>
 #include <windows.h>
+#include <tlhelp32.h>
+#include <psapi.h>
 #endif
 
 #include <benchmark.h>
@@ -2329,6 +2331,48 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     return max_gflops;
 }
 
+#ifdef _WIN32
+static int is_running_in_console()
+{
+    if (!_isatty(_fileno(stdin)))
+        return 0;
+
+    HWND consoleWindow = GetConsoleWindow();
+    if (consoleWindow == NULL)
+        return 0;
+
+    DWORD currentProcessId = GetCurrentProcessId();
+    DWORD parentProcessId = 0;
+
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE)
+        return 0;
+
+    PROCESSENTRY32 pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+
+    // Find parent process ID
+    if (Process32First(hSnapshot, &pe32)) {
+        do {
+            if (pe32.th32ProcessID == currentProcessId) {
+                parentProcessId = pe32.th32ParentProcessID;
+                break;
+            }
+        } while (Process32Next(hSnapshot, &pe32));
+    }
+    CloseHandle(hSnapshot);
+
+    if (parentProcessId == 0)
+        return 0;
+
+    HANDLE hParent = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, parentProcessId);
+    if (hParent == NULL)
+        return 0;
+
+    return 1;
+}
+#endif // _WIN32
+
 int main(int argc, char** argv)
 {
     if (argc != 1 && argc != 2)
@@ -2411,7 +2455,7 @@ int main(int argc, char** argv)
     ncnn::destroy_gpu_instance();
 
 #ifdef _WIN32
-    if (!_isatty(_fileno(stdin)))
+    if (!is_running_in_console())
     {
         fprintf(stderr, "\nPress any key to continue...\n");
 
@@ -2436,7 +2480,7 @@ int main(int argc, char** argv)
             ReadConsoleInput(hStdin, &record, 1, &read);
         } while (record.EventType != KEY_EVENT || !record.Event.KeyEvent.bKeyDown);
     }
-#endif
+#endif // _WIN32
 
     return 0;
 }
