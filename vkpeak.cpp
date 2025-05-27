@@ -4,11 +4,9 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
+#include <conio.h>
 #include <io.h>
-#define IS_TERMINAL() _isatty(_fileno(stdin))
-#else
-#include <unistd.h>
-#define IS_TERMINAL() isatty(STDIN_FILENO)
+#include <windows.h>
 #endif
 
 #include <benchmark.h>
@@ -2412,11 +2410,33 @@ int main(int argc, char** argv)
 
     ncnn::destroy_gpu_instance();
 
-    if (!IS_TERMINAL())
+#ifdef _WIN32
+    if (!_isatty(_fileno(stdin)))
     {
         fprintf(stderr, "\nPress any key to continue...\n");
-        getchar();
+
+        HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+
+        // mltiple flush strategy
+        FlushConsoleInputBuffer(hStdin);
+        while (_kbhit()) _getch();
+        fflush(stdin);
+
+        // delay to ensure all input is processed
+        Sleep(100);
+
+        // flush again
+        FlushConsoleInputBuffer(hStdin);
+        while (_kbhit()) _getch();
+
+        // use low-level API to ensure waiting for new input
+        INPUT_RECORD record;
+        DWORD read;
+        do {
+            ReadConsoleInput(hStdin, &record, 1, &read);
+        } while (record.EventType != KEY_EVENT || !record.Event.KeyEvent.bKeyDown);
     }
+#endif
 
     return 0;
 }
