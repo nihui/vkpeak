@@ -13,6 +13,14 @@ Download Windows/Linux/MacOS Executable for Intel/AMD/Nvidia/Apple GPU
 ## Usages
 
 ```shell
+vkpeak.exe
+```
+
+vkpeak will choose the default vulkan device.
+
+If you need to specify device id, then
+
+```shell
 vkpeak.exe 0
 ```
 
