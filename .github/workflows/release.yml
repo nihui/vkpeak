@@ -120,8 +120,36 @@ jobs:
         name: ${{ env.PACKAGENAME }}
         path: ${{ env.PACKAGENAME }}.zip
 
+  windows-arm:
+    needs: [setup]
+    runs-on: windows-11-arm
+    env:
+      UseMultiToolTask: true
+      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-windows-arm64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: build
+      run: |
+        mkdir build; cd build
+        cmake -A arm64 ..
+        cmake --build . --config Release -j 4
+    - name: package
+      run: |
+        mkdir ${{ env.PACKAGENAME }}
+        Copy-Item -Verbose -Path "README.md" -Destination "${{ env.PACKAGENAME }}"
+        Copy-Item -Verbose -Path "LICENSE" -Destination "${{ env.PACKAGENAME }}"
+        Copy-Item -Verbose -Path "build\Release\${{ needs.setup.outputs.APPNAME }}.exe" -Destination "${{ env.PACKAGENAME }}"
+        7z a -r ${{ env.PACKAGENAME }}.zip ${{ env.PACKAGENAME }}
+    - name: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PACKAGENAME }}
+        path: ${{ env.PACKAGENAME }}.zip
+
   release:
-    needs: [setup, ubuntu, macos, windows]
+    needs: [setup, ubuntu, macos, windows, windows-arm]
     runs-on: ubuntu-latest
     steps:
     - name: download
