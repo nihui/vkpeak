@@ -1,6 +1,7 @@
 # vkpeak
 
 ![CI](https://github.com/nihui/vkpeak/workflows/CI/badge.svg)
+![download](https://img.shields.io/github/downloads/nihui/vkpeak/total.svg)
 
 A synthetic benchmarking tool to measure peak capabilities of vulkan devices. It only measures the peak metrics that can be achieved using vector operations and does not represent a real-world use case.
 
