@@ -42,7 +42,7 @@ void main()
         c = a * c + b;
     }
 
-    c_blob_data[gx] = sfp(c);
+    c_blob_data[gx] = float(c);
 }
 )";
 
@@ -85,7 +85,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    c_blob_data[gx] = sfp(c0);
+    c_blob_data[gx] = float(c0);
 }
 )";
 
@@ -126,7 +126,7 @@ void main()
         c = a * c + b;
     }
 
-    c_blob_data[gx] = sfp((c[0] + c[1]) + (c[2] + c[3]));
+    c_blob_data[gx] = float((c[0] + c[1]) + (c[2] + c[3]));
 }
 )";
 
@@ -169,7 +169,7 @@ void main()
     }
 
     c0 = c0 + c1;
-    c_blob_data[gx] = sfp((c0[0] + c0[1]) + (c0[2] + c0[3]));
+    c_blob_data[gx] = float((c0[0] + c0[1]) + (c0[2] + c0[3]));
 }
 )";
 
@@ -1832,7 +1832,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         {
             if (vkdev->info.support_VK_KHR_cooperative_matrix())
             {
-                const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = vkdev->info.queryCooperativeMatrixProperties();
+                const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = vkdev->info.queryCooperativeMatrixSubProperties();
 
                 {
                     // find fp16 * fp16 => fp16
@@ -1876,7 +1876,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
             else // if (vkdev->info.support_VK_NV_cooperative_matrix())
             {
-                const std::vector<VkCooperativeMatrixPropertiesNV>& properties = vkdev->info.queryCooperativeMatrixPropertiesNV();
+                const std::vector<VkCooperativeMatrixPropertiesNV>& properties = vkdev->info.queryCooperativeMatrixSubPropertiesNV();
 
                 {
                     // find fp16 * fp16 => fp16
@@ -1924,7 +1924,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         {
             if (vkdev->info.support_VK_KHR_cooperative_matrix())
             {
-                const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = vkdev->info.queryCooperativeMatrixProperties();
+                const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = vkdev->info.queryCooperativeMatrixSubProperties();
 
                 // find int8 * int8 => int32
                 for (uint32_t j = 0; j < properties.size(); j++)
@@ -1945,7 +1945,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
             else // if (vkdev->info.support_VK_NV_cooperative_matrix())
             {
-                const std::vector<VkCooperativeMatrixPropertiesNV>& properties = vkdev->info.queryCooperativeMatrixPropertiesNV();
+                const std::vector<VkCooperativeMatrixPropertiesNV>& properties = vkdev->info.queryCooperativeMatrixSubPropertiesNV();
 
                 // find int8 * int8 => int32
                 for (uint32_t j = 0; j < properties.size(); j++)
@@ -1970,7 +1970,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         {
             if (vkdev->info.support_VK_KHR_cooperative_matrix())
             {
-                const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = vkdev->info.queryCooperativeMatrixProperties();
+                const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = vkdev->info.queryCooperativeMatrixSubProperties();
 
                 {
                     // find bf16 * bf16 => bf16
@@ -2210,7 +2210,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
         }
 
-        const int cmd_loop = 10;
+        const int cmd_loop = 6;
 
         for (int i = 0; i < cmd_loop; i++)
         {
