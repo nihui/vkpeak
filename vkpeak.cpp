@@ -1240,7 +1240,7 @@ static const char glsl_int8_matrix_data[] = R"(
 #if ncnn_VK_KHR_cooperative_matrix
 #extension GL_KHR_cooperative_matrix: require
 #elif ncnn_VK_NV_cooperative_matrix
-#extension GL_NV_cooperative_matrix: require
+#extension GL_NV_integer_cooperative_matrix : require
 #endif
 
 layout (constant_id = 0) const int loop = 1;
@@ -1322,7 +1322,7 @@ static const char glsl_int8_matrix_dual_data[] = R"(
 #if ncnn_VK_KHR_cooperative_matrix
 #extension GL_KHR_cooperative_matrix: require
 #elif ncnn_VK_NV_cooperative_matrix
-#extension GL_NV_cooperative_matrix: require
+#extension GL_NV_integer_cooperative_matrix : require
 #endif
 
 layout (constant_id = 0) const int loop = 1;
