@@ -2876,6 +2876,25 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
                 double t1 = ncnn::get_current_time();
 
+                double time = t1 - t0;
+
+                if (time < 300)
+                {
+                    // for fast device
+                    if (invocation_count * 2 <= max_invocation_count)
+                    {
+                        invocation_count = std::min(invocation_count * 2, max_invocation_count);
+                    }
+                    else
+                    {
+                        loop *= 2;
+                    }
+                    rerun = true;
+                    break;
+                }
+
+                t0 = ncnn::get_current_time();
+
                 ret = cmd_dual.submit_and_wait();
                 if (ret != 0)
                 {
@@ -2883,12 +2902,11 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     return 0;
                 }
 
-                double t2 = ncnn::get_current_time();
+                t1 = ncnn::get_current_time();
 
-                double time = t1 - t0;
-                double time_dual = t2 - t1;
+                double time_dual = t1 - t0;
 
-                if (time < 800 || time_dual < 800)
+                if (time_dual < 300)
                 {
                     // for fast device
                     if (invocation_count * 2 <= max_invocation_count)
