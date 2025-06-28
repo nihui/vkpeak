@@ -89,7 +89,7 @@ void main()
 }
 )";
 
-static const char glsl_p4_dual_data[] = R"(
+static const char glsl_p4_data[] = R"(
 #version 450
 
 layout (constant_id = 0) const int loop = 1;
@@ -130,7 +130,7 @@ void main()
 }
 )";
 
-static const char glsl_p4_data[] = R"(
+static const char glsl_p4_dual_data[] = R"(
 #version 450
 
 layout (constant_id = 0) const int loop = 1;
@@ -682,6 +682,182 @@ void main()
 
     c0 = c0 + c1;
     c_blob_data[gx] = int((c0[0] + c0[1]) + (c0[2] + c0[3]));
+}
+)";
+
+static const char glsl_int64_p1_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int64: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int64_t c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    int64_t c = int64_t(gx);
+
+    int64_t a = c;
+    int64_t b = int64_t(lx);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = c;
+}
+)";
+
+static const char glsl_int64_p1_dual_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int64: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int64_t c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    int64_t c0 = int64_t(gx);
+    int64_t c1 = int64_t(lx);
+
+    int64_t a = c0;
+    int64_t b = c1;
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+    }
+
+    c0 = c0 + c1;
+    c_blob_data[gx] = c0;
+}
+)";
+
+static const char glsl_int64_p4_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int64: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int64_t c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    i64vec4 c = i64vec4(gx);
+
+    i64vec4 a = c + i64vec4(0,1,2,-3);
+    i64vec4 b = i64vec4(lx) + i64vec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+        c = a * c + b;
+    }
+
+    c_blob_data[gx] = (c[0] + c[1]) + (c[2] + c[3]);
+}
+)";
+
+static const char glsl_int64_p4_dual_data[] = R"(
+#version 450
+
+#extension GL_EXT_shader_explicit_arithmetic_types_int64: require
+
+layout (constant_id = 0) const int loop = 1;
+
+layout (binding = 0) writeonly buffer c_blob { int64_t c_blob_data[]; };
+
+void main()
+{
+    const uint gx = gl_GlobalInvocationID.x;
+    const uint lx = gl_LocalInvocationID.x;
+
+    i64vec4 c0 = i64vec4(gx);
+    i64vec4 c1 = i64vec4(lx);
+
+    i64vec4 a = c0 + i64vec4(0,1,2,-3);
+    i64vec4 b = c1 + i64vec4(2,3,5,-7);
+
+    for (int i = 0; i < loop; i++)
+    {
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+        c0 = a * c0 + b;
+        c1 = a * c1 + b;
+    }
+
+    c0 = c0 + c1;
+    c_blob_data[gx] = (c0[0] + c0[1]) + (c0[2] + c0[3]);
 }
 )";
 
@@ -2034,7 +2210,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
-    if (!vkdev->info.support_int8_arithmetic() && arithmetic_type == 5)
+    if (!vkdev->info.support_int8_arithmetic() && arithmetic_type == 6)
     {
         return 0;
     }
@@ -2050,44 +2226,51 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         return 0;
     }
 
+    // check shader int64 feature
+    bool has_shader_int64 = vkdev->info.physicalDevicefeatures().shaderInt64;
+    if (!has_shader_int64 && (storage_type == 5 || arithmetic_type == 5))
+    {
+        return 0;
+    }
+
     // check shader int8 dotprod feature
     bool has_shader_int8_dotprod = vkdev->info.queryShaderIntegerDotProductFeatures().shaderIntegerDotProduct;
-    if (!has_shader_int8_dotprod && (arithmetic_type == 5 && packing_type == 4))
+    if (!has_shader_int8_dotprod && (arithmetic_type == 6 && packing_type == 4))
     {
         return 0;
     }
 
     // check shader bf16 feature
     bool has_shader_bf16 = vkdev->info.queryShaderBfloat16Features().shaderBFloat16Type;
-    if (!has_shader_bf16 && (arithmetic_type == 6))
+    if (!has_shader_bf16 && (arithmetic_type == 7))
     {
         return 0;
     }
 
     // check shader bf16 dotprod feature
     bool has_shader_bf16_dotprod = vkdev->info.queryShaderBfloat16Features().shaderBFloat16DotProduct;
-    if (!has_shader_bf16_dotprod && (arithmetic_type == 6 && packing_type == 4))
+    if (!has_shader_bf16_dotprod && (arithmetic_type == 7 && packing_type == 4))
     {
         return 0;
     }
 
     // check shader bf16 cooperative matrix feature
     bool has_shader_bf16_matrix = vkdev->info.queryShaderBfloat16Features().shaderBFloat16CooperativeMatrix;
-    if (!has_shader_bf16_matrix && (arithmetic_type == 6 && packing_type == 256))
+    if (!has_shader_bf16_matrix && (arithmetic_type == 7 && packing_type == 256))
     {
         return 0;
     }
 
     // check shader fp8 feature
     bool has_shader_fp8 = vkdev->info.queryShaderFloat8Features().shaderFloat8;
-    if (!has_shader_fp8 && (arithmetic_type == 7 || arithmetic_type == 8))
+    if (!has_shader_fp8 && (arithmetic_type == 8 || arithmetic_type == 9))
     {
         return 0;
     }
 
     // check shader fp8 cooperative matrix feature
     bool has_shader_fp8_matrix = vkdev->info.queryShaderFloat8Features().shaderFloat8CooperativeMatrix;
-    if (!has_shader_fp8_matrix && ((arithmetic_type == 7 || arithmetic_type == 8) && packing_type == 256))
+    if (!has_shader_fp8_matrix && ((arithmetic_type == 8 || arithmetic_type == 9) && packing_type == 256))
     {
         return 0;
     }
@@ -2120,12 +2303,12 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         // fp16 / int16
         elemsize = 2;
     }
-    else if (storage_type == 2)
+    else if (storage_type == 2 || storage_type == 5)
     {
-        // fp64
+        // fp64 / int64
         elemsize = 8;
     }
-    else if (storage_type == 5)
+    else if (storage_type == 6)
     {
         // int8
         elemsize = 1;
@@ -2240,7 +2423,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
         }
 
-        if (arithmetic_type == 5)
+        if (arithmetic_type == 6)
         {
             if (vkdev->info.support_VK_KHR_cooperative_matrix())
             {
@@ -2286,7 +2469,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
         }
 
-        if (arithmetic_type == 6)
+        if (arithmetic_type == 7)
         {
             if (vkdev->info.support_VK_KHR_cooperative_matrix())
             {
@@ -2334,7 +2517,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
         }
 
-        if (arithmetic_type == 7)
+        if (arithmetic_type == 8)
         {
             if (vkdev->info.support_VK_KHR_cooperative_matrix())
             {
@@ -2382,7 +2565,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
         }
 
-        if (arithmetic_type == 8)
+        if (arithmetic_type == 9)
         {
             if (vkdev->info.support_VK_KHR_cooperative_matrix())
             {
@@ -2516,6 +2699,19 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
             else if (arithmetic_type == 5)
             {
+                if (packing_type == 1)
+                {
+                    ncnn::compile_spirv_module(glsl_int64_p1_data, sizeof(glsl_int64_p1_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int64_p1_dual_data, sizeof(glsl_int64_p1_dual_data) - 1, opt, spirv_dual);
+                }
+                if (packing_type == 4)
+                {
+                    ncnn::compile_spirv_module(glsl_int64_p4_data, sizeof(glsl_int64_p4_data) - 1, opt, spirv);
+                    ncnn::compile_spirv_module(glsl_int64_p4_dual_data, sizeof(glsl_int64_p4_dual_data) - 1, opt, spirv_dual);
+                }
+            }
+            else if (arithmetic_type == 6)
+            {
                 if (packing_type == 4)
                 {
                     ncnn::compile_spirv_module(glsl_int8_p4_data, sizeof(glsl_int8_p4_data) - 1, opt, spirv);
@@ -2533,7 +2729,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     ncnn::compile_spirv_module(glsl_int8_matrix_dual_data, sizeof(glsl_int8_matrix_dual_data) - 1, opt, spirv_dual);
                 }
             }
-            else if (arithmetic_type == 6)
+            else if (arithmetic_type == 7)
             {
                 if (packing_type == 4)
                 {
@@ -2560,7 +2756,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     }
                 }
             }
-            else if (arithmetic_type == 7)
+            else if (arithmetic_type == 8)
             {
                 if (packing_type == 256)
                 {
@@ -2582,7 +2778,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     }
                 }
             }
-            else if (arithmetic_type == 8)
+            else if (arithmetic_type == 9)
             {
                 if (packing_type == 256)
                 {
@@ -2680,6 +2876,25 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
 
                 double t1 = ncnn::get_current_time();
 
+                double time = t1 - t0;
+
+                if (time < 300)
+                {
+                    // for fast device
+                    if (invocation_count * 2 <= max_invocation_count)
+                    {
+                        invocation_count = std::min(invocation_count * 2, max_invocation_count);
+                    }
+                    else
+                    {
+                        loop *= 2;
+                    }
+                    rerun = true;
+                    break;
+                }
+
+                t0 = ncnn::get_current_time();
+
                 ret = cmd_dual.submit_and_wait();
                 if (ret != 0)
                 {
@@ -2687,12 +2902,11 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     return 0;
                 }
 
-                double t2 = ncnn::get_current_time();
+                t1 = ncnn::get_current_time();
 
-                double time = t1 - t0;
-                double time_dual = t2 - t1;
+                double time_dual = t1 - t0;
 
-                if (time < 800 || time_dual < 800)
+                if (time_dual < 300)
                 {
                     // for fast device
                     if (invocation_count * 2 <= max_invocation_count)
@@ -2789,10 +3003,22 @@ int main(int argc, char** argv)
 
     fprintf(stderr, "device       = %s\n", ncnn::get_gpu_info(device_id).device_name());
 
-    // device_id        = 0
-    // storage_type     = 0/1/2/3/4/5/6/7/8 = fp32 fp16 fp64 int32 int16 int8 bf16 fp8 bf8
-    // arithmetic_type  = 0/1/2/3/4/5/6/7/8 = fp32 fp16 fp64 int32 int16 int8 bf16 fp8 bf8
-    // packing_type     = 1/4/256           = scalar vec4/dotprod matrix
+    // storage_type / arithmetic_type
+    //      0 = fp32
+    //      1 = fp16
+    //      2 = fp64
+    //      3 = int32
+    //      4 = int16
+    //      5 = int64
+    //      6 = int8
+    //      7 = bf16
+    //      8 = fp8
+    //      9 = bf8
+
+    // packing_type
+    //      1 = scalar
+    //      4 = vec4 / dotprod
+    //    256 = matrix
 
     fprintf(stderr, "\n");
     fprintf(stderr, "fp32-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 1));
@@ -2816,16 +3042,20 @@ int main(int argc, char** argv)
     fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 4, 4));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "int8-dotprod = %.2f GIOPS\n", vkpeak(device_id, 3, 5, 4));
-    fprintf(stderr, "int8-matrix  = %.2f GIOPS\n", vkpeak(device_id, 3, 5, 256));
+    fprintf(stderr, "int64-scalar = %.2f GIOPS\n", vkpeak(device_id, 5, 5, 1));
+    fprintf(stderr, "int64-vec4   = %.2f GIOPS\n", vkpeak(device_id, 5, 5, 4));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "bf16-dotprod = %.2f GFLOPS\n", vkpeak(device_id, 0, 6, 4));
-    fprintf(stderr, "bf16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 0, 6, 256));
+    fprintf(stderr, "int8-dotprod = %.2f GIOPS\n", vkpeak(device_id, 3, 6, 4));
+    fprintf(stderr, "int8-matrix  = %.2f GIOPS\n", vkpeak(device_id, 3, 6, 256));
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "fp8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 7, 256));
-    fprintf(stderr, "bf8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 8, 256));
+    fprintf(stderr, "bf16-dotprod = %.2f GFLOPS\n", vkpeak(device_id, 0, 7, 4));
+    fprintf(stderr, "bf16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 0, 7, 256));
+
+    fprintf(stderr, "\n");
+    fprintf(stderr, "fp8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 8, 256));
+    fprintf(stderr, "bf8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 9, 256));
 
     ncnn::destroy_gpu_instance();
 
