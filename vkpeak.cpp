@@ -2970,6 +2970,188 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     return max_gflops;
 }
 
+static double vkpeak_copy(int device_id, int from_type, int to_type)
+{
+    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device(device_id);
+
+    if (!vkdev)
+    {
+        return 0;
+    }
+
+    ncnn::Option opt;
+    opt.use_vulkan_compute = true;
+    opt.use_fp16_packed = false;
+    opt.use_fp16_storage = false;
+
+    ncnn::VkAllocator* staging_allocator = vkdev->acquire_staging_allocator();
+    ncnn::VkAllocator* allocator = vkdev->acquire_blob_allocator();
+
+    opt.blob_vkallocator = allocator;
+    opt.workspace_vkallocator = allocator;
+    opt.staging_vkallocator = staging_allocator;
+
+    bool d2d = from_type == 1 && to_type == 1;
+
+    // devbuf max 512M for host and 2G for d2d
+    size_t buffer_size = std::min((size_t)vkdev->get_heap_budget() / 8, d2d ? (size_t)2048 : (size_t)512) * 1024 * 1024;
+    if (vkdev->info.type() == 1)
+    {
+        // max 128M for integrated gpu
+        buffer_size = std::min(buffer_size, (size_t)128 * 1024 * 1024);
+    }
+
+    double max_gbps = 0;
+
+    if (from_type == 0 && to_type == 0)
+    {
+        ncnn::Mat a(1, buffer_size, 1);
+        ncnn::Mat b(1, buffer_size, 1);
+
+        const int cmd_loop = 10;
+
+        for (int i = 0; i < cmd_loop; i++)
+        {
+            // reset cache
+            memset(a, 0, buffer_size);
+
+            ncnn::sleep(100);
+
+            // time this
+            double t0 = ncnn::get_current_time();
+
+            memcpy(b, a, buffer_size);
+
+            double t1 = ncnn::get_current_time();
+
+            double time = t1 - t0;
+
+            double gbps = buffer_size / time / 1000000;
+
+            // fprintf(stderr, "%f gbps\n", gbps);
+
+            if (gbps > max_gbps)
+                max_gbps = gbps;
+        }
+    }
+    if (from_type == 0 && to_type == 1)
+    {
+        ncnn::VkMat devbuf(1, buffer_size, 1, staging_allocator);
+        ncnn::Mat hostbuf(1, buffer_size, 1);
+
+        void* devptr = devbuf.mapped_ptr();
+        void* hostptr = hostbuf.data;
+
+        const int cmd_loop = 10;
+
+        for (int i = 0; i < cmd_loop; i++)
+        {
+            // reset cache
+            memset(hostptr, 0, buffer_size);
+            staging_allocator->invalidate(devbuf.data);
+
+            ncnn::sleep(100);
+
+            // time this
+            double t0 = ncnn::get_current_time();
+
+            memcpy(devptr, hostptr, buffer_size);
+
+            staging_allocator->flush(devbuf.data);
+
+            double t1 = ncnn::get_current_time();
+
+            double time = t1 - t0;
+
+            double gbps = buffer_size / time / 1000000;
+
+            // fprintf(stderr, "%f gbps\n", gbps);
+
+            if (gbps > max_gbps)
+                max_gbps = gbps;
+        }
+    }
+    if (from_type == 1 && to_type == 0)
+    {
+        ncnn::VkMat devbuf(1, buffer_size, 1, staging_allocator);
+        ncnn::Mat hostbuf(1, buffer_size, 1);
+
+        void* devptr = devbuf.mapped_ptr();
+        void* hostptr = hostbuf.data;
+
+        const int cmd_loop = 10;
+
+        for (int i = 0; i < cmd_loop; i++)
+        {
+            // reset cache
+            staging_allocator->flush(devbuf.data);
+            memset(hostptr, 0, buffer_size);
+
+            ncnn::sleep(100);
+
+            // time this
+            double t0 = ncnn::get_current_time();
+
+            staging_allocator->invalidate(devbuf.data);
+
+            memcpy(hostptr, devptr, buffer_size);
+
+            double t1 = ncnn::get_current_time();
+
+            double time = t1 - t0;
+
+            double gbps = buffer_size / time / 1000000;
+
+            // fprintf(stderr, "%f gbps\n", gbps);
+
+            if (gbps > max_gbps)
+                max_gbps = gbps;
+        }
+    }
+    if (from_type == 1 && to_type == 1)
+    {
+        ncnn::VkMat a(1, buffer_size, 1, allocator);
+        ncnn::VkMat b(1, buffer_size, 1, allocator);
+
+        const int cmd_loop = 50;
+
+        for (int i = 0; i < cmd_loop; i++)
+        {
+            // encode command
+            ncnn::VkCompute cmd(vkdev);
+
+            cmd.record_clone(a, b, opt);
+
+            // time this
+            double t0 = ncnn::get_current_time();
+
+            int ret = cmd.submit_and_wait();
+            if (ret != 0)
+            {
+                vkdev->reclaim_staging_allocator(staging_allocator);
+                vkdev->reclaim_blob_allocator(allocator);
+                return 0;
+            }
+
+            double t1 = ncnn::get_current_time();
+
+            double time = t1 - t0;
+
+            double gbps = buffer_size / time / 1000000;
+
+            // fprintf(stderr, "%f gbps\n", gbps);
+
+            if (gbps > max_gbps)
+                max_gbps = gbps;
+        }
+    }
+
+    vkdev->reclaim_staging_allocator(staging_allocator);
+    vkdev->reclaim_blob_allocator(allocator);
+
+    return max_gbps;
+}
+
 int main(int argc, char** argv)
 {
     if (argc != 2)
@@ -3056,6 +3238,16 @@ int main(int argc, char** argv)
     fprintf(stderr, "\n");
     fprintf(stderr, "fp8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 8, 256));
     fprintf(stderr, "bf8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 9, 256));
+
+    // device_type
+    //      0 = cpu
+    //      1 = gpu
+
+    fprintf(stderr, "\n");
+    fprintf(stderr, "copy-h2h     = %.2f GBPS\n", vkpeak_copy(device_id, 0, 0));
+    fprintf(stderr, "copy-h2d     = %.2f GBPS\n", vkpeak_copy(device_id, 0, 1));
+    fprintf(stderr, "copy-d2h     = %.2f GBPS\n", vkpeak_copy(device_id, 1, 0));
+    fprintf(stderr, "copy-d2d     = %.2f GBPS\n", vkpeak_copy(device_id, 1, 1));
 
     ncnn::destroy_gpu_instance();
 
