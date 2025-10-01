@@ -647,7 +647,10 @@ void main()
 
     for (int i = 0; i < loop; i++)
     {)"
-        REPEAT_16(c = dot(uintBitsToBFloat16EXT(a), b); a.x = bfloat16BitsToUintEXT(c);)
+        REPEAT_4(c = dot(uintBitsToBFloat16EXT(a), b); a.x = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b); a.y = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b); a.z = bfloat16BitsToUintEXT(c);
+        c = dot(uintBitsToBFloat16EXT(a), b); a.w = bfloat16BitsToUintEXT(c);)
     R"(}
 
     c_blob_data[gx] = float(c);
@@ -678,7 +681,10 @@ void main()
 
     for (int i = 0; i < loop; i++)
     {)"
-        REPEAT_8(c0 = dot(uintBitsToBFloat16EXT(a0), b); a0.x = bfloat16BitsToUintEXT(c0); c1 = dot(uintBitsToBFloat16EXT(a1), b); a1.y = bfloat16BitsToUintEXT(c1);)
+        REPEAT_4(c0 = dot(uintBitsToBFloat16EXT(a0), b); a0.x = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b); a1.y = bfloat16BitsToUintEXT(c1);
+        c0 = dot(uintBitsToBFloat16EXT(a0), b); a0.z = bfloat16BitsToUintEXT(c0);
+        c1 = dot(uintBitsToBFloat16EXT(a1), b); a1.w = bfloat16BitsToUintEXT(c1);)
     R"(}
 
     c_blob_data[gx] = float(c0) + float(c1);
