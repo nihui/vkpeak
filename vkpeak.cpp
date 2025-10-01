@@ -5,6 +5,12 @@
 #include <gpu.h>
 #include <mat.h>
 
+#define REPEAT_1(...) #__VA_ARGS__ "\n"
+#define REPEAT_2(...) REPEAT_1(__VA_ARGS__) REPEAT_1(__VA_ARGS__)
+#define REPEAT_4(...) REPEAT_2(__VA_ARGS__) REPEAT_2(__VA_ARGS__)
+#define REPEAT_8(...) REPEAT_4(__VA_ARGS__) REPEAT_4(__VA_ARGS__)
+#define REPEAT_16(...) REPEAT_8(__VA_ARGS__) REPEAT_8(__VA_ARGS__)
+
 static const char glsl_p1_data[] = R"(
 #version 450
 
@@ -23,24 +29,9 @@ void main()
     afp b = afp(lx);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = float(c);
 }
@@ -65,24 +56,9 @@ void main()
     afp b = c1;
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = float(c0);
@@ -107,24 +83,9 @@ void main()
     afpvec4 b = afpvec4(lx) + afpvec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = float((c[0] + c[1]) + (c[2] + c[3]));
 }
@@ -149,24 +110,9 @@ void main()
     afpvec4 b = c1 + afpvec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = float((c0[0] + c0[1]) + (c0[2] + c0[3]));
@@ -191,24 +137,9 @@ void main()
     double b = double(lx);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = c;
 }
@@ -233,24 +164,9 @@ void main()
     double b = c1;
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = c0;
@@ -275,24 +191,9 @@ void main()
     dvec4 b = dvec4(lx) + dvec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = (c[0] + c[1]) + (c[2] + c[3]);
 }
@@ -317,24 +218,9 @@ void main()
     dvec4 b = c1 + dvec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = (c0[0] + c0[1]) + (c0[2] + c0[3]);
@@ -359,24 +245,9 @@ void main()
     int b = int(lx);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = c;
 }
@@ -401,24 +272,9 @@ void main()
     int b = c1;
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = c0;
@@ -443,24 +299,9 @@ void main()
     ivec4 b = ivec4(lx) + ivec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = (c[0] + c[1]) + (c[2] + c[3]);
 }
@@ -485,24 +326,9 @@ void main()
     ivec4 b = c1 + ivec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = (c0[0] + c0[1]) + (c0[2] + c0[3]);
@@ -529,24 +355,9 @@ void main()
     int16_t b = int16_t(lx);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = int(c);
 }
@@ -573,24 +384,9 @@ void main()
     int16_t b = c1;
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = int(c0);
@@ -617,24 +413,9 @@ void main()
     i16vec4 b = i16vec4(lx) + i16vec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = int((c[0] + c[1]) + (c[2] + c[3]));
 }
@@ -661,24 +442,9 @@ void main()
     i16vec4 b = c1 + i16vec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = int((c0[0] + c0[1]) + (c0[2] + c0[3]));
@@ -705,24 +471,9 @@ void main()
     int64_t b = int64_t(lx);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = c;
 }
@@ -749,24 +500,9 @@ void main()
     int64_t b = c1;
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = c0;
@@ -793,24 +529,9 @@ void main()
     i64vec4 b = i64vec4(lx) + i64vec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-        c = a * c + b;
-    }
+    {)"
+        REPEAT_16(c = a * c + b;)
+    R"(}
 
     c_blob_data[gx] = (c[0] + c[1]) + (c[2] + c[3]);
 }
@@ -837,24 +558,9 @@ void main()
     i64vec4 b = c1 + i64vec4(2,3,5,-7);
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-        c0 = a * c0 + b;
-        c1 = a * c1 + b;
-    }
+    {)"
+        REPEAT_8(c0 = a * c0 + b; c1 = a * c1 + b;)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = (c0[0] + c0[1]) + (c0[2] + c0[3]);
@@ -881,24 +587,9 @@ void main()
     int b = int(lx);
 
     for (int i = 0; i < loop; i++)
-    {
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-        c = dotPacked4x8AccSatEXT(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = dotPacked4x8AccSatEXT(a, b, c);)
+    R"(}
 
     c_blob_data[gx] = c;
 }
@@ -925,24 +616,9 @@ void main()
     int b = int(lx);
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-        c0 = dotPacked4x8AccSatEXT(a, b, c0);
-        c1 = dotPacked4x8AccSatEXT(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = dotPacked4x8AccSatEXT(a, b, c0); c1 = dotPacked4x8AccSatEXT(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     c_blob_data[gx] = c0;
@@ -970,40 +646,9 @@ void main()
     bf16vec4 b = uintBitsToBFloat16EXT(uint16_t(lx) + u16vec4(2,3,5,7));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.x = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.y = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.z = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.w = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.x = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.y = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.z = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.w = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.x = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.y = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.z = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.w = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.x = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.y = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.z = bfloat16BitsToUintEXT(c);
-        c = dot(uintBitsToBFloat16EXT(a), b);
-        a.w = bfloat16BitsToUintEXT(c);
-    }
+    {)"
+        REPEAT_16(c = dot(uintBitsToBFloat16EXT(a), b); a.x = bfloat16BitsToUintEXT(c);)
+    R"(}
 
     c_blob_data[gx] = float(c);
 }
@@ -1032,40 +677,9 @@ void main()
     bf16vec4 b = uintBitsToBFloat16EXT(uint16_t(lx) + u16vec4(2,3,5,7));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.x = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.y = bfloat16BitsToUintEXT(c1);
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.z = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.w = bfloat16BitsToUintEXT(c1);
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.x = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.y = bfloat16BitsToUintEXT(c1);
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.z = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.w = bfloat16BitsToUintEXT(c1);
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.x = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.y = bfloat16BitsToUintEXT(c1);
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.z = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.w = bfloat16BitsToUintEXT(c1);
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.x = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.y = bfloat16BitsToUintEXT(c1);
-        c0 = dot(uintBitsToBFloat16EXT(a0), b);
-        a0.z = bfloat16BitsToUintEXT(c0);
-        c1 = dot(uintBitsToBFloat16EXT(a1), b);
-        a1.w = bfloat16BitsToUintEXT(c1);
-    }
+    {)"
+        REPEAT_8(c0 = dot(uintBitsToBFloat16EXT(a0), b); a0.x = bfloat16BitsToUintEXT(c0); c1 = dot(uintBitsToBFloat16EXT(a1), b); a1.y = bfloat16BitsToUintEXT(c1);)
+    R"(}
 
     c_blob_data[gx] = float(c0) + float(c1);
 }
@@ -1102,24 +716,9 @@ void main()
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N) / 2, N / 2, gl_CooperativeMatrixLayoutRowMajor);
 #elif ncnn_VK_NV_cooperative_matrix
@@ -1129,24 +728,9 @@ void main()
     fcoopmatNV<16, gl_ScopeSubgroup, M, N> c = fcoopmatNV<16, gl_ScopeSubgroup, M, N>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAddNV(a, b, c);)
+    R"(}
 
     coopMatStoreNV(c, c_blob_data, gx * (M * N) / 2, N / 2, false);
 #endif
@@ -1185,24 +769,9 @@ void main()
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N) / 2, N / 2, gl_CooperativeMatrixLayoutRowMajor);
@@ -1214,24 +783,9 @@ void main()
     fcoopmatNV<16, gl_ScopeSubgroup, M, N> c1 = fcoopmatNV<16, gl_ScopeSubgroup, M, N>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAddNV(a, b, c0); c1 = coopMatMulAddNV(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStoreNV(c0, c_blob_data, gx * (M * N) / 2, N / 2, false);
@@ -1270,24 +824,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 #elif ncnn_VK_NV_cooperative_matrix
@@ -1297,24 +836,9 @@ void main()
     fcoopmatNV<32, gl_ScopeSubgroup, M, N> c = fcoopmatNV<32, gl_ScopeSubgroup, M, N>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAddNV(a, b, c);)
+    R"(}
 
     coopMatStoreNV(c, c_blob_data, gx * (M * N), N, false);
 #endif
@@ -1353,24 +877,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
@@ -1382,24 +891,9 @@ void main()
     fcoopmatNV<32, gl_ScopeSubgroup, M, N> c1 = fcoopmatNV<32, gl_ScopeSubgroup, M, N>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAddNV(a, b, c0); c1 = coopMatMulAddNV(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStoreNV(c0, c_blob_data, gx * (M * N), N, false);
@@ -1438,24 +932,9 @@ void main()
     coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(int(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 #elif ncnn_VK_NV_cooperative_matrix
@@ -1465,24 +944,9 @@ void main()
     icoopmatNV<32, gl_ScopeSubgroup, M, N> c = icoopmatNV<32, gl_ScopeSubgroup, M, N>(int(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-        c = coopMatMulAddNV(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAddNV(a, b, c);)
+    R"(}
 
     coopMatStoreNV(c, c_blob_data, gx * (M * N), N, false);
 #endif
@@ -1521,24 +985,9 @@ void main()
     coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<int, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(int(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
@@ -1550,24 +999,9 @@ void main()
     icoopmatNV<32, gl_ScopeSubgroup, M, N> c1 = icoopmatNV<32, gl_ScopeSubgroup, M, N>(int(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-        c0 = coopMatMulAddNV(a, b, c0);
-        c1 = coopMatMulAddNV(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAddNV(a, b, c0); c1 = coopMatMulAddNV(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStoreNV(c0, c_blob_data, gx * (M * N), N, false);
@@ -1602,24 +1036,9 @@ void main()
     coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N) / 2, N / 2, gl_CooperativeMatrixLayoutRowMajor);
 }
@@ -1653,24 +1072,9 @@ void main()
     coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<bfloat16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c2 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(c0);
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c3 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(c1);
@@ -1706,24 +1110,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
@@ -1756,24 +1145,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
@@ -1807,24 +1181,9 @@ void main()
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
@@ -1858,24 +1217,9 @@ void main()
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
@@ -1908,24 +1252,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
@@ -1958,24 +1287,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
@@ -2009,24 +1323,9 @@ void main()
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
@@ -2060,24 +1359,9 @@ void main()
     coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float16_t, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
@@ -2111,24 +1395,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(gx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-        c = coopMatMulAdd(a, b, c);
-    }
+    {)"
+        REPEAT_16(c = coopMatMulAdd(a, b, c);)
+    R"(}
 
     coopMatStore(c, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
@@ -2161,24 +1430,9 @@ void main()
     coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator> c1 = coopmat<float, gl_ScopeSubgroup, M, N, gl_MatrixUseAccumulator>(float(lx));
 
     for (int i = 0; i < loop; i++)
-    {
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-        c0 = coopMatMulAdd(a, b, c0);
-        c1 = coopMatMulAdd(a, b, c1);
-    }
+    {)"
+        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
+    R"(}
 
     c0 = c0 + c1;
     coopMatStore(c0, c_blob_data, gx * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
