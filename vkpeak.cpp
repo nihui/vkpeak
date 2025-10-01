@@ -5,7 +5,7 @@
 #include <gpu.h>
 #include <mat.h>
 
-#define REPEAT_1(...) #__VA_ARGS__ "\n"
+#define REPEAT_1(...) #__VA_ARGS__
 #define REPEAT_2(...) REPEAT_1(__VA_ARGS__) REPEAT_1(__VA_ARGS__)
 #define REPEAT_4(...) REPEAT_2(__VA_ARGS__) REPEAT_2(__VA_ARGS__)
 #define REPEAT_8(...) REPEAT_4(__VA_ARGS__) REPEAT_4(__VA_ARGS__)
