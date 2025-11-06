@@ -97,38 +97,38 @@ AMD RX9060XT 16GB
 ```
 device       = AMD Radeon Graphics (RADV GFX1200)
 
-fp32-scalar  = 17678.94 GFLOPS
-fp32-vec4    = 12213.09 GFLOPS
+fp32-scalar  = 17606.54 GFLOPS
+fp32-vec4    = 12155.22 GFLOPS
 
-fp16-scalar  = 16964.96 GFLOPS
-fp16-vec4    = 22503.93 GFLOPS
-fp16-matrix  = 107157.36 GFLOPS
+fp16-scalar  = 16921.16 GFLOPS
+fp16-vec4    = 27833.48 GFLOPS
+fp16-matrix  = 105337.66 GFLOPS
 
-fp64-scalar  = 444.89 GFLOPS
-fp64-vec4    = 439.69 GFLOPS
+fp64-scalar  = 442.80 GFLOPS
+fp64-vec4    = 437.55 GFLOPS
 
-int32-scalar = 2810.86 GIOPS
-int32-vec4   = 2802.29 GIOPS
+int32-scalar = 2804.59 GIOPS
+int32-vec4   = 2796.74 GIOPS
 
-int16-scalar = 15055.07 GIOPS
-int16-vec4   = 24225.60 GIOPS
+int16-scalar = 15034.62 GIOPS
+int16-vec4   = 26356.38 GIOPS
 
-int64-scalar = 937.59 GIOPS
-int64-vec4   = 773.06 GIOPS
+int64-scalar = 932.14 GIOPS
+int64-vec4   = 768.53 GIOPS
 
-int8-dotprod = 54025.21 GIOPS
-int8-matrix  = 194220.35 GIOPS
+int8-dotprod = 53893.32 GIOPS
+int8-matrix  = 194476.41 GIOPS
 
-bf16-dotprod = 0.00 GFLOPS
-bf16-matrix  = 0.00 GFLOPS
+bf16-dotprod = 24427.68 GFLOPS
+bf16-matrix  = 105099.82 GFLOPS
 
-fp8-matrix   = 0.00 GFLOPS
-bf8-matrix   = 0.00 GFLOPS
+fp8-matrix   = 205061.72 GFLOPS
+bf8-matrix   = 208234.02 GFLOPS
 
-copy-h2h     = 19.73 GBPS
-copy-h2d     = 19.32 GBPS
-copy-d2h     = 24.28 GBPS
-copy-d2d     = 145.94 GBPS
+copy-h2h     = 21.05 GBPS
+copy-h2d     = 21.17 GBPS
+copy-d2h     = 23.70 GBPS
+copy-d2d     = 145.23 GBPS
 ```
 
 ## Other Open-Source Code Used
