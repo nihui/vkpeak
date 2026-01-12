@@ -49,7 +49,7 @@ jobs:
     - name: build-x86_64
       run: |
         mkdir build-x86_64 && cd build-x86_64
-        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_SYSTEM_PROCESSOR="x86_64" \
             -DVulkan_LIBRARY=$GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }}/macOS/lib/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a \
             ..
         cmake --build . -j 4
