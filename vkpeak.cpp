@@ -1573,7 +1573,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         const VkPhysicalDeviceProperties& p = vkdev->info.physicalDeviceProperties();
         uint32_t max_buffer_size = (uint32_t)(p.limits.maxStorageBufferRange * 0.9) / 1024 / 1024 * 1024 * 1024;
-        buffer_size = std::min(buffer_size, (int)max_buffer_size);
+        buffer_size = (int)std::min((uint32_t)buffer_size, max_buffer_size);
     }
 
     ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
