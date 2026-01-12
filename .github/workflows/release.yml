@@ -35,7 +35,7 @@ jobs:
         submodules: 'recursive'
     - name: build
       run: |
-        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace quay.io/pypa/manylinux1_x86_64 /bin/bash -c "yum install cmake && mkdir -p build && cd build && cmake .. && cmake --build . -j 4"
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace quay.io/pypa/manylinux1_x86_64 /bin/bash -c "pip install cmake && mkdir -p build && cd build && cmake .. && cmake --build . -j 4"
     - name: package
       run: |
         mkdir -p ${{ env.PACKAGENAME }}
