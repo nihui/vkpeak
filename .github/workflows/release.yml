@@ -2,8 +2,8 @@ name: release
 on: workflow_dispatch
 
 env:
-  VULKANSDK_VERSION: 1.4.309.0
-  DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
+  VULKANSDK_VERSION: 1.4.335.1
+  DEVELOPER_DIR: /Applications/Xcode_16.4.0.app/Contents/Developer
   UseMultiToolTask: true
   APPLICATION_NAME: vkpeak
 
@@ -24,20 +24,18 @@ jobs:
         DATE=`date +'%Y%m%d'`
         echo "VERSION=${DATE}" >> $GITHUB_OUTPUT
 
-  ubuntu:
+  linux:
     needs: [setup]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
-      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-ubuntu
+      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-linux
     steps:
     - uses: actions/checkout@v6
       with:
         submodules: 'recursive'
     - name: build
       run: |
-        mkdir build && cd build
-        cmake ..
-        cmake --build . -j 4
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace quay.io/pypa/manylinux2014_x86_64 /bin/bash -c "mkdir -p build && cd build && cmake .. && cmake --build . -j 4"
     - name: package
       run: |
         mkdir -p ${{ env.PACKAGENAME }}
@@ -53,7 +51,7 @@ jobs:
 
   macos:
     needs: [setup]
-    runs-on: macos-13
+    runs-on: macos-15-intel
     env:
       PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-macos
     steps:
@@ -63,8 +61,8 @@ jobs:
     - name: vulkansdk
       run: |
         wget -q https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/mac/vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip?Human=true -O vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
-        unzip -q vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
-        sudo InstallVulkan-${{ env.VULKANSDK_VERSION }}.app/Contents/MacOS/InstallVulkan-${{ env.VULKANSDK_VERSION }} --root $GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }} --accept-licenses --default-answer --confirm-command install
+        unzip vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
+        sudo vulkansdk-macOS-${{ env.VULKANSDK_VERSION }}.app/Contents/MacOS/vulkansdk-macOS-${{ env.VULKANSDK_VERSION }} --root $GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }} --accept-licenses --default-answer --confirm-command install
     - name: build-x86_64
       run: |
         mkdir build-x86_64 && cd build-x86_64
@@ -121,7 +119,7 @@ jobs:
         path: ${{ env.PACKAGENAME }}.zip
 
   release:
-    needs: [setup, ubuntu, macos, windows]
+    needs: [setup, linux, macos, windows]
     runs-on: ubuntu-latest
     steps:
     - name: download

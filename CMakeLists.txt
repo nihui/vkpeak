@@ -143,6 +143,8 @@ option(WITH_LAYER_rmsnorm "" OFF)
 option(WITH_LAYER_spectrogram "" OFF)
 option(WITH_LAYER_inversespectrogram "" OFF)
 option(WITH_LAYER_flip "" OFF)
+option(WITH_LAYER_sdpa "" OFF)
+option(WITH_LAYER_rotaryembed "" OFF)
 
 add_subdirectory(ncnn)
 
