@@ -1568,6 +1568,14 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         // max 128M for integrated gpu
         buffer_size = std::min(buffer_size, 128 * 1024 * 1024);
     }
+
+    // sanitize buffer_size for 0.9x hardware limits
+    {
+        const VkPhysicalDeviceProperties& p = vkdev->info.physicalDeviceProperties();
+        uint32_t max_buffer_size = (uint32_t)(p.limits.maxStorageBufferRange * 0.9) / 1024 / 1024 * 1024 * 1024;
+        buffer_size = std::min(buffer_size, (int)max_buffer_size);
+    }
+
     ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
 
     int elemsize;
@@ -2297,6 +2305,13 @@ static double vkpeak_copy(int device_id, int from_type, int to_type)
     {
         // max 128M for integrated gpu
         buffer_size = std::min(buffer_size, (size_t)128 * 1024 * 1024);
+    }
+
+    // sanitize buffer_size for 0.9x hardware limits
+    {
+        const VkPhysicalDeviceProperties& p = vkdev->info.physicalDeviceProperties();
+        uint32_t max_buffer_size = (uint32_t)(p.limits.maxStorageBufferRange * 0.9) / 1024 / 1024 * 1024 * 1024;
+        buffer_size = std::min(buffer_size, (size_t)max_buffer_size);
     }
 
     double max_gbps = 0;
