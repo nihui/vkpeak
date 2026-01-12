@@ -2450,6 +2450,59 @@ static double vkpeak_copy(int device_id, int from_type, int to_type)
     return max_gbps;
 }
 
+static std::string get_gpu_driver_info(int device_id)
+{
+    ncnn::VulkanDevice* vkdev = ncnn::get_gpu_device(device_id);
+
+    if (!vkdev)
+    {
+        return std::string();
+    }
+
+    if (!vkdev->info.support_VK_KHR_driver_properties())
+    {
+        // driver version as info fallback
+        uint32_t vendor_id = vkdev->info.vendor_id();
+        uint32_t driver_version = vkdev->info.driver_version();
+
+        char tmp[128];
+        if (vendor_id == 0x10de)
+        {
+            // nvidia
+            sprintf(tmp, "%u.%u.%u.%u", (driver_version >> 22) & 0x3ff, (driver_version >> 14) & 0x0ff, (driver_version >> 6) & 0x0ff, (driver_version) & 0x003f);
+        }
+        else if (vendor_id == 0x14e4)
+        {
+            // broadcom
+            uint32_t major = driver_version / 10000;
+            uint32_t minor = (driver_version % 10000) / 100;
+            sprintf(tmp, "%u.%u", major, minor);
+        }
+        else if (vendor_id == 0x1010)
+        {
+            // imagination
+            if (driver_version > 500000000)
+            {
+                sprintf(tmp, "0.0.%u", driver_version - 500000000);
+            }
+            else
+            {
+                sprintf(tmp, "%u", driver_version);
+            }
+        }
+        else
+        {
+            // use vulkan version convention
+            sprintf(tmp, "%u.%u.%u", VK_VERSION_MAJOR(driver_version), VK_VERSION_MINOR(driver_version), VK_VERSION_PATCH(driver_version));
+        }
+
+        return std::string(tmp);
+    }
+
+    const VkPhysicalDeviceDriverPropertiesKHR& p = vkdev->info.queryDriverProperties();
+    return std::string(p.driverName) + " / " + std::string(p.driverInfo);
+}
+
 int main(int argc, char** argv)
 {
     if (argc != 2)
@@ -2482,6 +2535,7 @@ int main(int argc, char** argv)
     }
 
     fprintf(stderr, "device       = %s\n", ncnn::get_gpu_info(device_id).device_name());
+    fprintf(stderr, "driver       = %s\n", get_gpu_driver_info(device_id).c_str());
 
     // storage_type / arithmetic_type
     //      0 = fp32
