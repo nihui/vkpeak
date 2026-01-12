@@ -28,7 +28,7 @@ jobs:
     needs: [setup]
     runs-on: ubuntu-latest
     container:
-      image: quay.io/pypa/manylinux1_x86_64
+      image: quay.io/pypa/manylinux_2_28_x86_64
     env:
       PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-linux
     steps:
