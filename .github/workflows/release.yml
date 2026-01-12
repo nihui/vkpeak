@@ -24,11 +24,13 @@ jobs:
         DATE=`date +'%Y%m%d'`
         echo "VERSION=${DATE}" >> $GITHUB_OUTPUT
 
-  ubuntu:
+  linux:
     needs: [setup]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pypa/manylinux1_x86_64
     env:
-      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-ubuntu
+      PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-linux
     steps:
     - uses: actions/checkout@v6
       with:
@@ -62,7 +64,7 @@ jobs:
         submodules: 'recursive'
     - name: vulkansdk
       run: |
-        wget https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/mac/vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip?Human=true -O vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
+        wget -q https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/mac/vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip?Human=true -O vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
         unzip vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
         sudo vulkansdk-macOS-${{ env.VULKANSDK_VERSION }}.app/Contents/MacOS/vulkansdk-macOS-${{ env.VULKANSDK_VERSION }} --root $GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }} --accept-licenses --default-answer --confirm-command install
     - name: build-x86_64
@@ -121,7 +123,7 @@ jobs:
         path: ${{ env.PACKAGENAME }}.zip
 
   release:
-    needs: [setup, ubuntu, macos, windows]
+    needs: [setup, linux, macos, windows]
     runs-on: ubuntu-latest
     steps:
     - name: download
