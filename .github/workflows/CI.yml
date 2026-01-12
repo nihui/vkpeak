@@ -27,17 +27,13 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
-    container:
-      image: quay.io/pypa/manylinux_2_28_x86_64
     steps:
     - uses: actions/checkout@v6
       with:
         submodules: 'recursive'
     - name: build
       run: |
-        mkdir build && cd build
-        cmake ..
-        cmake --build . -j 4
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace quay.io/pypa/manylinux1_x86_64 /bin/bash -c "mkdir -p build && cd build && cmake .. && cmake --build . -j 4"
 
   macos:
     runs-on: macos-15
