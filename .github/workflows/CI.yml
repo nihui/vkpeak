@@ -2,8 +2,8 @@ name: CI
 on: [push, pull_request]
 
 env:
-  VULKANSDK_VERSION: 1.4.309.0
-  DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
+  VULKANSDK_VERSION: 1.4.335.1
+  DEVELOPER_DIR: /Applications/Xcode_16.4.0.app/Contents/Developer
   UseMultiToolTask: true
 
 concurrency:
@@ -38,16 +38,16 @@ jobs:
         cmake --build . -j 4
 
   macos:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v6
       with:
         submodules: 'recursive'
     - name: vulkansdk
       run: |
-        wget -q https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/mac/vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip?Human=true -O vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
-        unzip -q vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
-        sudo InstallVulkan-${{ env.VULKANSDK_VERSION }}.app/Contents/MacOS/InstallVulkan-${{ env.VULKANSDK_VERSION }} --root $GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }} --accept-licenses --default-answer --confirm-command install
+        wget https://sdk.lunarg.com/sdk/download/${{ env.VULKANSDK_VERSION }}/mac/vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip?Human=true -O vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
+        unzip vulkansdk-macos-${{ env.VULKANSDK_VERSION }}.zip
+        sudo vulkansdk-macOS-${{ env.VULKANSDK_VERSION }}.app/Contents/MacOS/vulkansdk-macOS-${{ env.VULKANSDK_VERSION }} --root $GITHUB_WORKSPACE/${{ env.VULKANSDK_VERSION }} --accept-licenses --default-answer --confirm-command install
     - name: build-x86_64
       run: |
         mkdir build-x86_64 && cd build-x86_64
