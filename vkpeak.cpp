@@ -5,6 +5,11 @@
 #include <gpu.h>
 #include <mat.h>
 
+#include <cerrno>
+#include <limits>
+#include <set>
+#include <vector>
+
 #define REPEAT_1(...) #__VA_ARGS__
 #define REPEAT_2(...) REPEAT_1(__VA_ARGS__) REPEAT_1(__VA_ARGS__)
 #define REPEAT_4(...) REPEAT_2(__VA_ARGS__) REPEAT_2(__VA_ARGS__)
@@ -2518,40 +2523,60 @@ static std::string get_gpu_driver_info(int device_id)
     return std::string(p.driverName) + " / " + std::string(p.driverInfo);
 }
 
-int main(int argc, char** argv)
+struct benchmark_scenario_t
 {
-    if (argc != 2)
+    const char* name;
+    const char* unit;
+    int arg0;
+    int arg1;
+    int arg2;
+    bool is_copy;
+};
+
+static std::vector<std::string> split_scenarios(const std::string& s)
+{
+    std::vector<std::string> scenarios;
+
+    size_t start = 0;
+    while (start <= s.size())
     {
-        fprintf(stderr, "Usage: %s [device_id]\n", argv[0]);
-        return -1;
-    }
+        size_t end = s.find(',', start);
+        std::string token = s.substr(start, end == std::string::npos ? std::string::npos : end - start);
 
-    ncnn::create_gpu_instance();
-
-    const int gpu_count = ncnn::get_gpu_count();
-    if (gpu_count == 0)
-    {
-        fprintf(stderr, "No vulkan device\n");
-        return -1;
-    }
-
-    const int device_id = atoi(argv[1]);
-    if (device_id < 0 || device_id >= gpu_count)
-    {
-        fprintf(stderr, "No vulkan device for %d\n", device_id);
-        fprintf(stderr, "Available devices:\n");
-
-        for (int i = 0; i < gpu_count; i++)
+        size_t first = token.find_first_not_of(" \t\r\n");
+        if (first != std::string::npos)
         {
-            fprintf(stderr, "%d = %s\n", i, ncnn::get_gpu_info(i).device_name());
+            size_t last = token.find_last_not_of(" \t\r\n");
+            scenarios.push_back(token.substr(first, last - first + 1));
         }
 
-        return -1;
+        if (end == std::string::npos)
+            break;
+
+        start = end + 1;
     }
 
-    fprintf(stderr, "device       = %s\n", ncnn::get_gpu_info(device_id).device_name());
-    fprintf(stderr, "driver       = %s\n", get_gpu_driver_info(device_id).c_str());
+    return scenarios;
+}
 
+static void print_available_scenarios(const benchmark_scenario_t* scenarios, size_t scenario_count)
+{
+    fprintf(stderr, "Available scenarios:\n");
+    for (size_t i = 0; i < scenario_count; i++)
+    {
+        fprintf(stderr, "  %s\n", scenarios[i].name);
+    }
+}
+
+static void print_usage(const char* prog, const benchmark_scenario_t* scenarios, size_t scenario_count)
+{
+    fprintf(stderr, "Usage: %s [device_id] [scenario|scenario1,scenario2,...]\n", prog);
+    fprintf(stderr, "       %s [scenario|scenario1,scenario2,...]\n", prog);
+    print_available_scenarios(scenarios, scenario_count);
+}
+
+int main(int argc, char** argv)
+{
     // storage_type / arithmetic_type
     //      0 = fp32
     //      1 = fp16
@@ -2569,52 +2594,167 @@ int main(int argc, char** argv)
     //      4 = vec4 / dotprod
     //    256 = matrix
 
-    fprintf(stderr, "\n");
-    fprintf(stderr, "fp32-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 1));
-    fprintf(stderr, "fp32-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 0, 0, 4));
+    const benchmark_scenario_t scenarios[] = {
+        {"fp32-scalar", "GFLOPS", 0, 0, 1, false},
+        {"fp32-vec4", "GFLOPS", 0, 0, 4, false},
+        {"fp16-scalar", "GFLOPS", 0, 1, 1, false},
+        {"fp16-vec4", "GFLOPS", 0, 1, 4, false},
+        {"fp16-matrix", "GFLOPS", 1, 1, 256, false},
+        {"fp64-scalar", "GFLOPS", 2, 2, 1, false},
+        {"fp64-vec4", "GFLOPS", 2, 2, 4, false},
+        {"int32-scalar", "GIOPS", 3, 3, 1, false},
+        {"int32-vec4", "GIOPS", 3, 3, 4, false},
+        {"int16-scalar", "GIOPS", 3, 4, 1, false},
+        {"int16-vec4", "GIOPS", 3, 4, 4, false},
+        {"int64-scalar", "GIOPS", 5, 5, 1, false},
+        {"int64-vec4", "GIOPS", 5, 5, 4, false},
+        {"int8-dotprod", "GIOPS", 3, 6, 4, false},
+        {"int8-matrix", "GIOPS", 3, 6, 256, false},
+        {"bf16-dotprod", "GFLOPS", 0, 7, 4, false},
+        {"bf16-matrix", "GFLOPS", 0, 7, 256, false},
+        {"fp8-matrix", "GFLOPS", 0, 8, 256, false},
+        {"bf8-matrix", "GFLOPS", 0, 9, 256, false},
+        {"copy-h2h", "GBPS", 0, 0, 0, true},
+        {"copy-h2d", "GBPS", 0, 1, 0, true},
+        {"copy-d2h", "GBPS", 1, 0, 0, true},
+        {"copy-d2d", "GBPS", 1, 1, 0, true},
+    };
+    const size_t scenario_count = sizeof(scenarios) / sizeof(scenarios[0]);
+
+    if (argc > 3)
+    {
+        print_usage(argv[0], scenarios, scenario_count);
+        return -1;
+    }
+
+    ncnn::create_gpu_instance();
+
+    const int gpu_count = ncnn::get_gpu_count();
+    if (gpu_count == 0)
+    {
+        fprintf(stderr, "No vulkan device\n");
+        ncnn::destroy_gpu_instance();
+        return -1;
+    }
+
+    int device_id = 0;
+    const char* scenario_arg_ptr = 0;
+
+    if (argc >= 2)
+    {
+        char* endptr = 0;
+        errno = 0;
+        long parsed_device_id = strtol(argv[1], &endptr, 10);
+        if (*argv[1] != '\0' && endptr && *endptr == '\0')
+        {
+            /* try to parse first argument as device id */
+            if (errno == ERANGE || parsed_device_id < std::numeric_limits<int>::min() || parsed_device_id > std::numeric_limits<int>::max())
+            {
+                fprintf(stderr, "Invalid device_id %s\n", argv[1]);
+                ncnn::destroy_gpu_instance();
+                return -1;
+            }
+
+            device_id = (int)parsed_device_id;
+            if (argc == 3)
+            {
+                scenario_arg_ptr = argv[2];
+            }
+        }
+        else
+        {
+            /* parse first argument as scenario list specifier */
+            scenario_arg_ptr = argv[1];
+            if (argc >= 3)
+            {
+                /* extra, invalid arguments supplied; program cannot continue */
+                print_usage(argv[0], scenarios, scenario_count);
+                ncnn::destroy_gpu_instance();
+                return -1;
+            }
+        }
+    }
+
+    if (device_id < 0 || device_id >= gpu_count)
+    {
+        fprintf(stderr, "No vulkan device for %d\n", device_id);
+        fprintf(stderr, "Available devices:\n");
+
+        for (int i = 0; i < gpu_count; i++)
+        {
+            fprintf(stderr, "%d = %s\n", i, ncnn::get_gpu_info(i).device_name());
+        }
+
+        ncnn::destroy_gpu_instance();
+        return -1;
+    }
+
+    fprintf(stderr, "device       = %s\n", ncnn::get_gpu_info(device_id).device_name());
+    fprintf(stderr, "driver       = %s\n", get_gpu_driver_info(device_id).c_str());
+
+    std::set<std::string> selected_scenarios;
+    if (scenario_arg_ptr)
+    {
+        std::string scenario_arg = scenario_arg_ptr;
+        size_t first = scenario_arg.find_first_not_of(" \t\r\n");
+        if (first != std::string::npos)
+        {
+            size_t last = scenario_arg.find_last_not_of(" \t\r\n");
+            scenario_arg = scenario_arg.substr(first, last - first + 1);
+        }
+        else
+        {
+            scenario_arg.clear();
+        }
+
+        if (!scenario_arg.empty() && scenario_arg != "all")
+        {
+            std::vector<std::string> parsed_scenarios = split_scenarios(scenario_arg);
+            if (parsed_scenarios.empty())
+            {
+                fprintf(stderr, "Invalid scenario list\n");
+                print_available_scenarios(scenarios, scenario_count);
+                ncnn::destroy_gpu_instance();
+                return -1;
+            }
+
+            for (size_t i = 0; i < parsed_scenarios.size(); i++)
+            {
+                const std::string& scenario_name = parsed_scenarios[i];
+
+                bool found = false;
+                for (size_t j = 0; j < scenario_count; j++)
+                {
+                    if (scenario_name == scenarios[j].name)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    fprintf(stderr, "Unknown scenario %s\n", scenario_name.c_str());
+                    print_available_scenarios(scenarios, scenario_count);
+                    ncnn::destroy_gpu_instance();
+                    return -1;
+                }
+
+                selected_scenarios.insert(scenario_name);
+            }
+        }
+    }
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "fp16-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 0, 1, 1));
-    fprintf(stderr, "fp16-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 0, 1, 4));
-    fprintf(stderr, "fp16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 1, 1, 256));
+    for (size_t i = 0; i < scenario_count; i++)
+    {
+        const benchmark_scenario_t& scenario = scenarios[i];
+        if (!selected_scenarios.empty() && selected_scenarios.count(scenario.name) == 0)
+            continue;
 
-    fprintf(stderr, "\n");
-    fprintf(stderr, "fp64-scalar  = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 1));
-    fprintf(stderr, "fp64-vec4    = %.2f GFLOPS\n", vkpeak(device_id, 2, 2, 4));
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "int32-scalar = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 1));
-    fprintf(stderr, "int32-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 3, 4));
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "int16-scalar = %.2f GIOPS\n", vkpeak(device_id, 3, 4, 1));
-    fprintf(stderr, "int16-vec4   = %.2f GIOPS\n", vkpeak(device_id, 3, 4, 4));
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "int64-scalar = %.2f GIOPS\n", vkpeak(device_id, 5, 5, 1));
-    fprintf(stderr, "int64-vec4   = %.2f GIOPS\n", vkpeak(device_id, 5, 5, 4));
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "int8-dotprod = %.2f GIOPS\n", vkpeak(device_id, 3, 6, 4));
-    fprintf(stderr, "int8-matrix  = %.2f GIOPS\n", vkpeak(device_id, 3, 6, 256));
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "bf16-dotprod = %.2f GFLOPS\n", vkpeak(device_id, 0, 7, 4));
-    fprintf(stderr, "bf16-matrix  = %.2f GFLOPS\n", vkpeak(device_id, 0, 7, 256));
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "fp8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 8, 256));
-    fprintf(stderr, "bf8-matrix   = %.2f GFLOPS\n", vkpeak(device_id, 0, 9, 256));
-
-    // device_type
-    //      0 = cpu
-    //      1 = gpu
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "copy-h2h     = %.2f GBPS\n", vkpeak_copy(device_id, 0, 0));
-    fprintf(stderr, "copy-h2d     = %.2f GBPS\n", vkpeak_copy(device_id, 0, 1));
-    fprintf(stderr, "copy-d2h     = %.2f GBPS\n", vkpeak_copy(device_id, 1, 0));
-    fprintf(stderr, "copy-d2d     = %.2f GBPS\n", vkpeak_copy(device_id, 1, 1));
+        const double score = scenario.is_copy ? vkpeak_copy(device_id, scenario.arg0, scenario.arg1) : vkpeak(device_id, scenario.arg0, scenario.arg1, scenario.arg2);
+        fprintf(stdout, "%-12s = %.2f %s\n", scenario.name, score, scenario.unit);
+    }
 
     ncnn::destroy_gpu_instance();
 
