@@ -17,7 +17,7 @@ Download Windows/Linux/MacOS Executable for Intel/AMD/Nvidia/Apple GPU
 vkpeak.exe
 ```
 
-vkpeak will choose the default vulkan device.
+vkpeak will choose the default vulkan device (device id 0).
 
 If you need to specify device id, then
 
@@ -25,7 +25,59 @@ If you need to specify device id, then
 vkpeak.exe 0
 ```
 
-The only parameter 0 is the device id.
+The `device_id` parameter is optional and defaults to `0`.
+
+By default, if you do not pass a scenario argument, vkpeak runs all available scenarios.
+
+You can optionally select one scenario:
+
+```shell
+vkpeak.exe fp16-matrix
+```
+
+Or with an explicit device id:
+
+```shell
+vkpeak.exe 0 fp16-matrix
+```
+
+Or run a comma-separated list of scenarios:
+
+```shell
+vkpeak.exe 0 fp16-matrix,int8-matrix,copy-d2d
+```
+
+You can also explicitly request all scenarios:
+
+```shell
+vkpeak.exe 0 all
+```
+
+Available scenario names:
+
+- fp32-scalar
+- fp32-vec4
+- fp16-scalar
+- fp16-vec4
+- fp16-matrix
+- fp64-scalar
+- fp64-vec4
+- int32-scalar
+- int32-vec4
+- int16-scalar
+- int16-vec4
+- int64-scalar
+- int64-vec4
+- int8-dotprod
+- int8-matrix
+- bf16-dotprod
+- bf16-matrix
+- fp8-matrix
+- bf8-matrix
+- copy-h2h
+- copy-h2d
+- copy-d2h
+- copy-d2d
 
 If you encounter a crash or error, try upgrading your GPU driver:
 
