@@ -2,7 +2,7 @@ name: release
 on: workflow_dispatch
 
 env:
-  VULKANSDK_VERSION: 1.4.335.1
+  VULKANSDK_VERSION: 1.4.350.0
   DEVELOPER_DIR: /Applications/Xcode_16.4.0.app/Contents/Developer
   UseMultiToolTask: true
   APPLICATION_NAME: vkpeak
