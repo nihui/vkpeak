@@ -183,6 +183,44 @@ copy-d2h     = 23.70 GBPS
 copy-d2d     = 145.23 GBPS
 ```
 
+AMD RX9070XT 16GB
+```
+device       = AMD Radeon RX 9070 XT (RADV GFX1201)
+
+fp32-scalar  = 35499.88 GFLOPS
+fp32-vec4    = 24469.68 GFLOPS
+
+fp16-scalar  = 34127.63 GFLOPS
+fp16-vec4    = 55966.64 GFLOPS
+fp16-matrix  = 214419.79 GFLOPS
+
+fp64-scalar  = 876.26 GFLOPS
+fp64-vec4    = 871.68 GFLOPS
+
+int32-scalar = 5624.66 GIOPS
+int32-vec4   = 5617.52 GIOPS
+
+int16-scalar = 29966.15 GIOPS
+int16-vec4   = 53031.47 GIOPS
+
+int64-scalar = 1871.93 GIOPS
+int64-vec4   = 1543.96 GIOPS
+
+int8-dotprod = 107156.45 GIOPS
+int8-matrix  = 384988.43 GIOPS
+
+bf16-dotprod = 49309.31 GFLOPS
+bf16-matrix  = 213406.13 GFLOPS
+
+fp8-matrix   = 421175.51 GFLOPS
+bf8-matrix   = 424792.17 GFLOPS
+
+copy-h2h     = 27.06 GBPS
+copy-h2d     = 26.25 GBPS
+copy-d2h     = 28.06 GBPS
+copy-d2d     = 305.30 GBPS
+```
+
 ## Other Open-Source Code Used
 
 - https://github.com/Tencent/ncnn for fast neural network inference on ALL PLATFORMS
