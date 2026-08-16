@@ -74,10 +74,15 @@ Available scenario names:
 - bf16-matrix
 - fp8-matrix
 - bf8-matrix
+- fp6-matrix
+- bf6-matrix
+- fp4-matrix
 - copy-h2h
 - copy-h2d
 - copy-d2h
 - copy-d2d
+
+For the 6-bit scenarios, `fp6-matrix` means E2M3 and `bf6-matrix` means E3M2. OCP names both encodings FP6; `bf6` is used here as a convenient range-oriented counterpart to `fp6`.
 
 If you encounter a crash or error, try upgrading your GPU driver:
 
