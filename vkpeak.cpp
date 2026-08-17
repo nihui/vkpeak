@@ -2941,6 +2941,67 @@ static std::string get_gpu_driver_info(int device_id)
     return std::string(p.driverName) + " / " + std::string(p.driverInfo);
 }
 
+static std::string json_escape(const std::string& s)
+{
+    std::string o;
+    o.reserve(s.size() + 2);
+    for (size_t i = 0; i < s.size(); i++)
+    {
+        char c = s[i];
+        switch (c)
+        {
+        case '\"': o += "\\\""; break;
+        case '\\': o += "\\\\"; break;
+        case '\b': o += "\\b"; break;
+        case '\f': o += "\\f"; break;
+        case '\n': o += "\\n"; break;
+        case '\r': o += "\\r"; break;
+        case '\t': o += "\\t"; break;
+        default:
+            if ((unsigned char)c < 0x20)
+            {
+                char buf[8];
+                sprintf(buf, "\\u%04x", c);
+                o += buf;
+            }
+            else
+            {
+                o += c;
+            }
+            break;
+        }
+    }
+    return o;
+}
+
+static std::string sanitize_filename(const std::string& s)
+{
+    // keep [A-Za-z0-9.-], replace any other (illegal/space/etc) char with '_'
+    // consecutive replacements collapse into a single '_', leading/trailing '_' trimmed
+    std::string o;
+    o.reserve(s.size());
+    for (size_t i = 0; i < s.size(); i++)
+    {
+        unsigned char c = (unsigned char)s[i];
+        bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '.';
+        if (ok)
+        {
+            o += (char)c;
+        }
+        else if (o.empty() || o[o.size() - 1] != '_')
+        {
+            o += '_';
+        }
+    }
+
+    size_t b = o.find_first_not_of('_');
+    if (b == std::string::npos)
+        return std::string();
+
+    size_t e = o.find_last_not_of('_');
+    return o.substr(b, e - b + 1);
+}
+
 struct benchmark_scenario_t
 {
     const char* name;
@@ -2988,8 +3049,9 @@ static void print_available_scenarios(const benchmark_scenario_t* scenarios, siz
 
 static void print_usage(const char* prog, const benchmark_scenario_t* scenarios, size_t scenario_count)
 {
-    fprintf(stderr, "Usage: %s [device_id] [scenario|scenario1,scenario2,...]\n", prog);
-    fprintf(stderr, "       %s [scenario|scenario1,scenario2,...]\n", prog);
+    fprintf(stderr, "Usage: %s [device_id] [scenario|scenario1,scenario2,...] [--json[=FILE]]\n", prog);
+    fprintf(stderr, "       %s [scenario|scenario1,scenario2,...] [--json[=FILE]]\n", prog);
+    fprintf(stderr, "  --json[=FILE]  write results as JSON to FILE (default vkpeak_<device>.json)\n");
     print_available_scenarios(scenarios, scenario_count);
 }
 
@@ -3044,6 +3106,37 @@ int main(int argc, char** argv)
         {"copy-d2d", "GBPS", 1, 1, 0, true},
     };
     const size_t scenario_count = sizeof(scenarios) / sizeof(scenarios[0]);
+
+    // parse and strip the optional --json[=FILE] flag from argv
+    // without an explicit FILE the path is derived from the device name later
+    bool output_json = false;
+    bool json_path_explicit = false;
+    std::string json_path;
+    {
+        int w = 1;
+        for (int i = 1; i < argc; i++)
+        {
+            std::string a = argv[i];
+            if (a == "--json")
+            {
+                output_json = true;
+                continue;
+            }
+            if (a.rfind("--json=", 0) == 0)
+            {
+                output_json = true;
+                std::string p = a.substr(7);
+                if (!p.empty())
+                {
+                    json_path = p;
+                    json_path_explicit = true;
+                }
+                continue;
+            }
+            argv[w++] = argv[i];
+        }
+        argc = w;
+    }
 
     if (argc > 3)
     {
@@ -3113,8 +3206,18 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    fprintf(stderr, "device       = %s\n", ncnn::get_gpu_info(device_id).device_name());
-    fprintf(stderr, "driver       = %s\n", get_gpu_driver_info(device_id).c_str());
+    std::string device_name = ncnn::get_gpu_info(device_id).device_name();
+    std::string driver_info = get_gpu_driver_info(device_id);
+
+    fprintf(stderr, "device       = %s\n", device_name.c_str());
+    fprintf(stderr, "driver       = %s\n", driver_info.c_str());
+
+    // derive the default json filename from the device name (illegal chars -> '_')
+    if (output_json && !json_path_explicit)
+    {
+        std::string safe = sanitize_filename(device_name);
+        json_path = safe.empty() ? std::string("vkpeak.json") : ("vkpeak_" + safe + ".json");
+    }
 
     std::set<std::string> selected_scenarios;
     if (scenario_arg_ptr)
@@ -3169,15 +3272,59 @@ int main(int argc, char** argv)
         }
     }
 
-    fprintf(stderr, "\n");
-    for (size_t i = 0; i < scenario_count; i++)
+    if (output_json)
     {
-        const benchmark_scenario_t& scenario = scenarios[i];
-        if (!selected_scenarios.empty() && selected_scenarios.count(scenario.name) == 0)
-            continue;
+        FILE* jfp = fopen(json_path.c_str(), "wb");
+        if (!jfp)
+        {
+            fprintf(stderr, "failed to open %s for writing\n", json_path.c_str());
+            ncnn::destroy_gpu_instance();
+            return -1;
+        }
 
-        const double score = scenario.is_copy ? vkpeak_copy(device_id, scenario.arg0, scenario.arg1) : vkpeak(device_id, scenario.arg0, scenario.arg1, scenario.arg2);
-        fprintf(stdout, "%-12s = %.2f %s\n", scenario.name, score, scenario.unit);
+        fprintf(jfp, "{\n");
+        fprintf(jfp, "  \"device\": \"%s\",\n", json_escape(device_name).c_str());
+        fprintf(jfp, "  \"driver\": \"%s\",\n", json_escape(driver_info).c_str());
+        fprintf(jfp, "  \"results\": [\n");
+
+        fprintf(stderr, "\n");
+
+        bool first = true;
+        for (size_t i = 0; i < scenario_count; i++)
+        {
+            const benchmark_scenario_t& scenario = scenarios[i];
+            if (!selected_scenarios.empty() && selected_scenarios.count(scenario.name) == 0)
+                continue;
+
+            const double score = scenario.is_copy ? vkpeak_copy(device_id, scenario.arg0, scenario.arg1) : vkpeak(device_id, scenario.arg0, scenario.arg1, scenario.arg2);
+
+            // live progress to stderr
+            fprintf(stderr, "%-12s = %.2f %s\n", scenario.name, score, scenario.unit);
+
+            if (!first)
+                fprintf(jfp, ",\n");
+            first = false;
+
+            fprintf(jfp, "    { \"name\": \"%s\", \"value\": %.2f, \"unit\": \"%s\" }", scenario.name, score, scenario.unit);
+        }
+
+        fprintf(jfp, "%s  ]\n}\n", first ? "" : "\n");
+        fclose(jfp);
+
+        fprintf(stderr, "\nresults written to %s\n", json_path.c_str());
+    }
+    else
+    {
+        fprintf(stderr, "\n");
+        for (size_t i = 0; i < scenario_count; i++)
+        {
+            const benchmark_scenario_t& scenario = scenarios[i];
+            if (!selected_scenarios.empty() && selected_scenarios.count(scenario.name) == 0)
+                continue;
+
+            const double score = scenario.is_copy ? vkpeak_copy(device_id, scenario.arg0, scenario.arg1) : vkpeak(device_id, scenario.arg0, scenario.arg1, scenario.arg2);
+            fprintf(stdout, "%-12s = %.2f %s\n", scenario.name, score, scenario.unit);
+        }
     }
 
     ncnn::destroy_gpu_instance();
