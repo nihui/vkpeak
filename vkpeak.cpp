@@ -1822,7 +1822,8 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
-    if (!vkdev->info.support_int8_arithmetic() && arithmetic_type == 6)
+    // Packed 4x8 dot products use 32-bit operands and do not require shaderInt8.
+    if (!vkdev->info.support_int8_arithmetic() && arithmetic_type == 6 && packing_type != 4)
     {
         return 0;
     }
