@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <limits>
 #include <set>
+#include <string>
 #include <vector>
 
 #define REPEAT_1(...) #__VA_ARGS__
@@ -1506,104 +1507,30 @@ void main()
 }
 )";
 
-// SPIR-V enum values used below: OpTypeFloat=22, Float6EXT=4228,
-// Float4EXT=4229, Float6E2M3EXT=4223, Float6E3M2EXT=4224,
-// Float4E2M1EXT=4225, BitcastExtractEXT=4232,
-// OpBitcastExtractEXT=4195.
-static const char glsl_fp6_matrix_data[] = R"(
-#version 450
+// GL_EXT_spirv_intrinsics lets glslang use the OCP encodings as matrix
+// component types. The Vulkan driver must also advertise the matching MMA.
+static const char glsl_ocp_matrix_data[] = R"(
+#extension GL_KHR_memory_scope_semantics: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_cooperative_matrix: require
+#extension GL_EXT_spirv_intrinsics: require
 
+// OpTypeFloat = 22, Float6EXT = 4228, Float4EXT = 4229.
+#if OCP_FORMAT == 0
 #define ocp_input_t spirv_type(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4228], id = 22, 6, 4223)
-
-#extension GL_KHR_memory_scope_semantics: require
-#extension GL_EXT_shader_explicit_arithmetic_types: require
-#extension GL_KHR_cooperative_matrix: require
-#extension GL_EXT_spirv_intrinsics: require
-
-spirv_instruction(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4232], id = 4195) ocp_input_t ocp_input(uint value, uint offset);
-
-layout (constant_id = 0) const int loop = 1;
-layout (constant_id = 1) const int M = 1;
-layout (constant_id = 2) const int N = 1;
-layout (constant_id = 3) const int K = 1;
-layout (constant_id = 4) const int SCOPE = 3;
-
-layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
-
-void main()
-{
-    const uint matrix_id = gl_WorkGroupID.x;
-    const uint seed = matrix_id * 1664525u + 1013904223u;
-    const uint a_input = 1u + ((seed >> 8) & 1u);
-    const uint b_input = 1u + ((seed >> 16) & 1u);
-
-    coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA> a = coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA>(ocp_input(a_input, 0u));
-    coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB> b = coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB>(ocp_input(b_input, 0u));
-
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(a_input));
-
-    for (int i = 0; i < loop; i++)
-    {)"
-        REPEAT_16(c = coopMatMulAdd(a, b, c);)
-    R"(}
-
-    coopMatStore(c, c_blob_data, matrix_id * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
-}
-)";
-
-static const char glsl_fp6_matrix_dual_data[] = R"(
-#version 450
-
-#define ocp_input_t spirv_type(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4228], id = 22, 6, 4223)
-
-#extension GL_KHR_memory_scope_semantics: require
-#extension GL_EXT_shader_explicit_arithmetic_types: require
-#extension GL_KHR_cooperative_matrix: require
-#extension GL_EXT_spirv_intrinsics: require
-
-spirv_instruction(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4232], id = 4195) ocp_input_t ocp_input(uint value, uint offset);
-
-layout (constant_id = 0) const int loop = 1;
-layout (constant_id = 1) const int M = 1;
-layout (constant_id = 2) const int N = 1;
-layout (constant_id = 3) const int K = 1;
-layout (constant_id = 4) const int SCOPE = 3;
-
-layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
-
-void main()
-{
-    const uint matrix_id = gl_WorkGroupID.x;
-    const uint seed = matrix_id * 1664525u + 1013904223u;
-    const uint a_input = 1u + ((seed >> 8) & 1u);
-    const uint b_input = 1u + ((seed >> 16) & 1u);
-
-    coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA> a = coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA>(ocp_input(a_input, 0u));
-    coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB> b = coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB>(ocp_input(b_input, 0u));
-
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c0 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(a_input));
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c1 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(b_input));
-
-    for (int i = 0; i < loop; i++)
-    {)"
-        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
-    R"(}
-
-    c0 = c0 + c1;
-    coopMatStore(c0, c_blob_data, matrix_id * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
-}
-)";
-
-static const char glsl_bf6_matrix_data[] = R"(
-#version 450
-
+const uint half_bits = 0x04u;
+const uint one_bits = 0x08u;
+#elif OCP_FORMAT == 1
 #define ocp_input_t spirv_type(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4228], id = 22, 6, 4224)
+const uint half_bits = 0x08u;
+const uint one_bits = 0x0cu;
+#else
+#define ocp_input_t spirv_type(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4229], id = 22, 4, 4225)
+const uint half_bits = 0x01u;
+const uint one_bits = 0x02u;
+#endif
 
-#extension GL_KHR_memory_scope_semantics: require
-#extension GL_EXT_shader_explicit_arithmetic_types: require
-#extension GL_KHR_cooperative_matrix: require
-#extension GL_EXT_spirv_intrinsics: require
-
+// BitcastExtractEXT = 4232, OpBitcastExtractEXT = 4195.
 spirv_instruction(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4232], id = 4195) ocp_input_t ocp_input(uint value, uint offset);
 
 layout (constant_id = 0) const int loop = 1;
@@ -1618,55 +1545,15 @@ void main()
 {
     const uint matrix_id = gl_WorkGroupID.x;
     const uint seed = matrix_id * 1664525u + 1013904223u;
-    const uint a_input = 1u + ((seed >> 8) & 1u);
-    const uint b_input = 1u + ((seed >> 16) & 1u);
+    const uint a_input = (seed >> 8) & 1u;
+    const uint b_input = (seed >> 16) & 1u;
 
-    coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA> a = coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA>(ocp_input(a_input, 0u));
-    coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB> b = coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB>(ocp_input(b_input, 0u));
+    coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA> a = coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA>(ocp_input(a_input == 0u ? half_bits : one_bits, 0u));
+    coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB> b = coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB>(ocp_input(b_input == 0u ? half_bits : one_bits, 0u));
 
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(a_input));
-
-    for (int i = 0; i < loop; i++)
-    {)"
-        REPEAT_16(c = coopMatMulAdd(a, b, c);)
-    R"(}
-
-    coopMatStore(c, c_blob_data, matrix_id * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
-}
-)";
-
-static const char glsl_bf6_matrix_dual_data[] = R"(
-#version 450
-
-#define ocp_input_t spirv_type(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4228], id = 22, 6, 4224)
-
-#extension GL_KHR_memory_scope_semantics: require
-#extension GL_EXT_shader_explicit_arithmetic_types: require
-#extension GL_KHR_cooperative_matrix: require
-#extension GL_EXT_spirv_intrinsics: require
-
-spirv_instruction(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4232], id = 4195) ocp_input_t ocp_input(uint value, uint offset);
-
-layout (constant_id = 0) const int loop = 1;
-layout (constant_id = 1) const int M = 1;
-layout (constant_id = 2) const int N = 1;
-layout (constant_id = 3) const int K = 1;
-layout (constant_id = 4) const int SCOPE = 3;
-
-layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
-
-void main()
-{
-    const uint matrix_id = gl_WorkGroupID.x;
-    const uint seed = matrix_id * 1664525u + 1013904223u;
-    const uint a_input = 1u + ((seed >> 8) & 1u);
-    const uint b_input = 1u + ((seed >> 16) & 1u);
-
-    coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA> a = coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA>(ocp_input(a_input, 0u));
-    coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB> b = coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB>(ocp_input(b_input, 0u));
-
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c0 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(a_input));
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c1 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(b_input));
+    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c0 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(a_input + 1u));
+#if DUAL_ISSUE
+    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c1 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(b_input + 1u));
 
     for (int i = 0; i < loop; i++)
     {)"
@@ -1674,128 +1561,25 @@ void main()
     R"(}
 
     c0 = c0 + c1;
+#else
+    for (int i = 0; i < loop; i++)
+    {)"
+        REPEAT_16(c0 = coopMatMulAdd(a, b, c0);)
+    R"(}
+#endif
+
     coopMatStore(c0, c_blob_data, matrix_id * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
 }
 )";
 
-static const char glsl_fp4_matrix_data[] = R"(
-#version 450
-
-#define ocp_input_t spirv_type(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4229], id = 22, 4, 4225)
-
-#extension GL_KHR_memory_scope_semantics: require
-#extension GL_EXT_shader_explicit_arithmetic_types: require
-#extension GL_KHR_cooperative_matrix: require
-#extension GL_EXT_spirv_intrinsics: require
-
-spirv_instruction(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4232], id = 4195) ocp_input_t ocp_input(uint value, uint offset);
-
-layout (constant_id = 0) const int loop = 1;
-layout (constant_id = 1) const int M = 1;
-layout (constant_id = 2) const int N = 1;
-layout (constant_id = 3) const int K = 1;
-layout (constant_id = 4) const int SCOPE = 3;
-
-layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
-
-void main()
+static int compile_ocp_matrix_shader(int format, bool dual, const ncnn::Option& opt, std::vector<uint32_t>& spirv)
 {
-    const uint matrix_id = gl_WorkGroupID.x;
-    const uint seed = matrix_id * 1664525u + 1013904223u;
-    const uint a_input = 1u + ((seed >> 8) & 1u);
-    const uint b_input = 1u + ((seed >> 16) & 1u);
-
-    coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA> a = coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA>(ocp_input(a_input, 0u));
-    coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB> b = coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB>(ocp_input(b_input, 0u));
-
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(a_input));
-
-    for (int i = 0; i < loop; i++)
-    {)"
-        REPEAT_16(c = coopMatMulAdd(a, b, c);)
-    R"(}
-
-    coopMatStore(c, c_blob_data, matrix_id * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
+    const std::string source = "#version 450\n#define OCP_FORMAT " + std::to_string(format)
+                               + "\n#define DUAL_ISSUE " + (dual ? "1\n" : "0\n") + glsl_ocp_matrix_data;
+    return ncnn::compile_spirv_module(source.data(), (int)source.size(), opt, spirv);
 }
-)";
 
-static const char glsl_fp4_matrix_dual_data[] = R"(
-#version 450
-
-#define ocp_input_t spirv_type(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4229], id = 22, 4, 4225)
-
-#extension GL_KHR_memory_scope_semantics: require
-#extension GL_EXT_shader_explicit_arithmetic_types: require
-#extension GL_KHR_cooperative_matrix: require
-#extension GL_EXT_spirv_intrinsics: require
-
-spirv_instruction(extensions = ["SPV_EXT_ocp_microscaling_types"], capabilities = [4232], id = 4195) ocp_input_t ocp_input(uint value, uint offset);
-
-layout (constant_id = 0) const int loop = 1;
-layout (constant_id = 1) const int M = 1;
-layout (constant_id = 2) const int N = 1;
-layout (constant_id = 3) const int K = 1;
-layout (constant_id = 4) const int SCOPE = 3;
-
-layout (binding = 0) writeonly buffer c_blob { float c_blob_data[]; };
-
-void main()
-{
-    const uint matrix_id = gl_WorkGroupID.x;
-    const uint seed = matrix_id * 1664525u + 1013904223u;
-    const uint a_input = 1u + ((seed >> 8) & 1u);
-    const uint b_input = 1u + ((seed >> 16) & 1u);
-
-    coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA> a = coopmat<ocp_input_t, SCOPE, M, K, gl_MatrixUseA>(ocp_input(a_input, 0u));
-    coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB> b = coopmat<ocp_input_t, SCOPE, K, N, gl_MatrixUseB>(ocp_input(b_input, 0u));
-
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c0 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(a_input));
-    coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator> c1 = coopmat<afp, SCOPE, M, N, gl_MatrixUseAccumulator>(float(b_input));
-
-    for (int i = 0; i < loop; i++)
-    {)"
-        REPEAT_8(c0 = coopMatMulAdd(a, b, c0); c1 = coopMatMulAdd(a, b, c1);)
-    R"(}
-
-    c0 = c0 + c1;
-    coopMatStore(c0, c_blob_data, matrix_id * (M * N), N, gl_CooperativeMatrixLayoutRowMajor);
-}
-)";
-
-static bool has_cooperative_matrix_type(const ncnn::GpuInfo& info, VkComponentTypeKHR input_type, VkComponentTypeKHR accumulator_type)
-{
-    if (info.support_VK_EXT_cooperative_matrix_maintenance1())
-    {
-        const std::vector<VkCooperativeMatrixProperties2EXT>& properties = info.queryCooperativeMatrixSubProperties2EXT();
-        for (size_t i = 0; i < properties.size(); i++)
-        {
-            const VkCooperativeMatrixProperties2EXT& cmp = properties[i];
-            if (cmp.AType == input_type && cmp.BType == input_type
-                && cmp.CType == accumulator_type && cmp.ResultType == accumulator_type
-                && cmp.MGranularity != 0 && cmp.NGranularity != 0 && cmp.KGranularity != 0)
-            {
-                return true;
-            }
-        }
-    }
-
-    if (info.support_VK_KHR_cooperative_matrix())
-    {
-        const std::vector<VkCooperativeMatrixPropertiesKHR>& properties = info.queryCooperativeMatrixSubProperties();
-        for (size_t i = 0; i < properties.size(); i++)
-        {
-            const VkCooperativeMatrixPropertiesKHR& cmp = properties[i];
-            if (cmp.AType == input_type && cmp.BType == input_type
-                && cmp.CType == accumulator_type && cmp.ResultType == accumulator_type
-                && cmp.scope == VK_SCOPE_SUBGROUP_KHR)
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
+static const double unsupported_matrix = -1.;
 
 static double vkpeak(int device_id, int storage_type, int arithmetic_type, int packing_type)
 {
@@ -1805,6 +1589,8 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
+
+    const bool ocp_matrix = arithmetic_type >= 10 && arithmetic_type <= 12;
 
     if (!vkdev->info.support_fp16_storage() && storage_type == 1)
     {
@@ -1827,7 +1613,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     {
         return 0;
     }
-    if (!vkdev->info.support_cooperative_matrix() && packing_type == 256)
+    if (!ocp_matrix && !vkdev->info.support_cooperative_matrix() && packing_type == 256)
     {
         return 0;
     }
@@ -1888,45 +1674,22 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         return 0;
     }
 
-    // check shader ocp microscaling type features
-    const VkPhysicalDeviceShaderOCPMicroscalingTypesFeaturesEXT& ocp_features = vkdev->info.queryShaderOCPMicroscalingTypesFeatures();
-    if (!ocp_features.shaderFloat6 && (arithmetic_type == 10 || arithmetic_type == 11))
+    if (ocp_matrix)
     {
-        return 0;
-    }
-    if (!ocp_features.shaderFloat4 && arithmetic_type == 12)
-    {
-        return 0;
-    }
-    if (!vkdev->info.support_VK_KHR_cooperative_matrix() && (arithmetic_type == 10 || arithmetic_type == 11 || arithmetic_type == 12))
-    {
-        return 0;
+        const VkPhysicalDeviceShaderOCPMicroscalingTypesFeaturesEXT& features = vkdev->info.queryShaderOCPMicroscalingTypesFeatures();
+        if (!vkdev->info.queryCooperativeMatrixFeatures().cooperativeMatrix
+                || !(arithmetic_type == 12 ? features.shaderFloat4 : features.shaderFloat6))
+        {
+            return unsupported_matrix;
+        }
     }
 
     ncnn::Option opt;
     opt.use_vulkan_compute = true;
+    opt.vulkan_device_index = device_id;
     opt.use_fp16_packed = storage_type == 1;
     opt.use_fp16_storage = storage_type == 1 || storage_type == 4;
     opt.use_fp16_arithmetic = arithmetic_type == 1;
-
-    ncnn::VkAllocator* allocator = vkdev->acquire_blob_allocator();
-
-    // reuse c storage, max 512M
-    int buffer_size = std::min((int)(vkdev->get_heap_budget() / 8), 512) * 1024 * 1024;
-    if (vkdev->info.type() == 1)
-    {
-        // max 128M for integrated gpu
-        buffer_size = std::min(buffer_size, 128 * 1024 * 1024);
-    }
-
-    // sanitize buffer_size for 0.9x hardware limits
-    {
-        const VkPhysicalDeviceProperties& p = vkdev->info.physicalDeviceProperties();
-        uint32_t max_buffer_size = (uint32_t)(p.limits.maxStorageBufferRange * 0.9) / 1024 / 1024 * 1024 * 1024;
-        buffer_size = (int)std::min((uint32_t)buffer_size, max_buffer_size);
-    }
-
-    ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
 
     int elemsize;
     if (storage_type == 0 || storage_type == 3)
@@ -1966,7 +1729,6 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
     bool use_fp16_fp32_matrix = false;
     bool use_bf16_fp32_matrix = false;
     bool use_fp8_fp32_matrix = false;
-    bool use_ocp_fp32_matrix = false;
     int matrix_subgroup_size = local_size_x;
     if (packing_type == 256)
     {
@@ -2266,43 +2028,23 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
             }
         }
 
-        if (arithmetic_type == 10 || arithmetic_type == 11 || arithmetic_type == 12)
+        if (ocp_matrix)
         {
-            VkComponentTypeKHR input_type;
-            if (arithmetic_type == 10)
-            {
-                input_type = VK_COMPONENT_TYPE_FLOAT6_E2M3_EXT;
-            }
-            else if (arithmetic_type == 11)
-            {
-                input_type = VK_COMPONENT_TYPE_FLOAT6_E3M2_EXT;
-            }
-            else
-            {
-                input_type = VK_COMPONENT_TYPE_FLOAT4_E2M1_EXT;
-            }
-
-            const VkComponentTypeKHR accumulator_types[2] = {
-                VK_COMPONENT_TYPE_FLOAT16_KHR,
-                VK_COMPONENT_TYPE_FLOAT32_KHR,
+            const VkComponentTypeKHR input_types[] = {
+                VK_COMPONENT_TYPE_FLOAT6_E2M3_EXT,
+                VK_COMPONENT_TYPE_FLOAT6_E3M2_EXT,
+                VK_COMPONENT_TYPE_FLOAT4_E2M1_EXT,
             };
+            const VkComponentTypeKHR preferred_accumulator = vkdev->info.support_fp16_arithmetic() ? VK_COMPONENT_TYPE_FLOAT16_KHR : VK_COMPONENT_TYPE_FLOAT32_KHR;
+            VkComponentTypeKHR accumulator;
+            vkdev->info.get_optimal_cooperative_matrix_mnk(1024, 1024, 1024, input_types[arithmetic_type - 10], preferred_accumulator,
+                    VK_SCOPE_SUBGROUP_KHR, M, N, K, matrix_subgroup_size, accumulator);
+            if (M == 0 || N == 0 || K == 0)
+                return unsupported_matrix;
 
-            for (int i = 0; i < 2 && !mnk_found; i++)
-            {
-                const VkComponentTypeKHR accumulator_type = accumulator_types[i];
-                if (!has_cooperative_matrix_type(vkdev->info, input_type, accumulator_type))
-                    continue;
-
-                vkdev->info.get_optimal_cooperative_matrix_mnk(1024, 1024, 1024, input_type, accumulator_type, VK_SCOPE_SUBGROUP_KHR, M, N, K, matrix_subgroup_size);
-                if (M != 0 && N != 0 && K != 0)
-                {
-                    SCOPE = (int)VK_SCOPE_SUBGROUP_KHR;
-                    use_ocp_fp32_matrix = accumulator_type == VK_COMPONENT_TYPE_FLOAT32_KHR;
-                    opt.use_fp16_arithmetic = accumulator_type == VK_COMPONENT_TYPE_FLOAT16_KHR;
-                    local_size_x = matrix_subgroup_size;
-                    mnk_found = true;
-                }
-            }
+            opt.use_fp16_arithmetic = accumulator == VK_COMPONENT_TYPE_FLOAT16_KHR;
+            local_size_x = matrix_subgroup_size;
+            mnk_found = true;
         }
 
         if (!mnk_found)
@@ -2312,12 +2054,30 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         }
     }
 
+    // Reuse the output storage, up to 512 MiB.
+    int buffer_size = std::min((int)(vkdev->get_heap_budget() / 8), 512) * 1024 * 1024;
+    if (vkdev->info.type() == 1)
+    {
+        // max 128M for integrated gpu
+        buffer_size = std::min(buffer_size, 128 * 1024 * 1024);
+    }
+
+    // sanitize buffer_size for 0.9x hardware limits
+    {
+        const VkPhysicalDeviceProperties& p = vkdev->info.physicalDeviceProperties();
+        uint32_t max_buffer_size = (uint32_t)(p.limits.maxStorageBufferRange * 0.9) / 1024 / 1024 * 1024 * 1024;
+        buffer_size = (int)std::min((uint32_t)buffer_size, max_buffer_size);
+    }
+
+    ncnn::VkAllocator* allocator = vkdev->acquire_blob_allocator();
+    ncnn::VkMat c(buffer_size, (size_t)1u, 1, allocator);
+
     int max_invocation_count = buffer_size / elemsize;
     // make max_invocation_count be multiple of local_size_x
     max_invocation_count = std::max(max_invocation_count / local_size_x, 1) * local_size_x;
     if (packing_type == 256)
     {
-        if (use_fp16_fp32_matrix || use_bf16_fp32_matrix || use_fp8_fp32_matrix || use_ocp_fp32_matrix)
+        if (use_fp16_fp32_matrix || use_bf16_fp32_matrix || use_fp8_fp32_matrix)
             max_invocation_count = std::max(max_invocation_count / (M * N) / 2, 1);
         else
             max_invocation_count = std::max(max_invocation_count / (M * N), 1);
@@ -2340,7 +2100,7 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
         ncnn::Pipeline pipeline(vkdev);
         ncnn::Pipeline pipeline_dual(vkdev);
         {
-            if (arithmetic_type == 10 || arithmetic_type == 11 || arithmetic_type == 12)
+            if (ocp_matrix)
             {
                 pipeline.set_subgroup_size(matrix_subgroup_size);
                 pipeline_dual.set_subgroup_size(matrix_subgroup_size);
@@ -2501,32 +2261,22 @@ static double vkpeak(int device_id, int storage_type, int arithmetic_type, int p
                     }
                 }
             }
-            else if (arithmetic_type == 10 || arithmetic_type == 11 || arithmetic_type == 12)
+            else if (ocp_matrix)
             {
-                if (packing_type == 256)
-                {
-                    // loop M N K SCOPE
-                    specializations.resize(5);
-                    specializations[1].i = M;
-                    specializations[2].i = N;
-                    specializations[3].i = K;
-                    specializations[4].i = SCOPE;
+                // loop M N K SCOPE
+                specializations.resize(5);
+                specializations[1].i = M;
+                specializations[2].i = N;
+                specializations[3].i = K;
+                specializations[4].i = SCOPE;
 
-                    if (arithmetic_type == 10)
-                    {
-                        ncnn::compile_spirv_module(glsl_fp6_matrix_data, sizeof(glsl_fp6_matrix_data) - 1, opt, spirv);
-                        ncnn::compile_spirv_module(glsl_fp6_matrix_dual_data, sizeof(glsl_fp6_matrix_dual_data) - 1, opt, spirv_dual);
-                    }
-                    else if (arithmetic_type == 11)
-                    {
-                        ncnn::compile_spirv_module(glsl_bf6_matrix_data, sizeof(glsl_bf6_matrix_data) - 1, opt, spirv);
-                        ncnn::compile_spirv_module(glsl_bf6_matrix_dual_data, sizeof(glsl_bf6_matrix_dual_data) - 1, opt, spirv_dual);
-                    }
-                    else
-                    {
-                        ncnn::compile_spirv_module(glsl_fp4_matrix_data, sizeof(glsl_fp4_matrix_data) - 1, opt, spirv);
-                        ncnn::compile_spirv_module(glsl_fp4_matrix_dual_data, sizeof(glsl_fp4_matrix_dual_data) - 1, opt, spirv_dual);
-                    }
+                const int format = arithmetic_type - 10;
+                if (compile_ocp_matrix_shader(format, false, opt, spirv) != 0
+                        || compile_ocp_matrix_shader(format, true, opt, spirv_dual) != 0)
+                {
+                    fprintf(stderr, "Failed to compile OCP cooperative matrix shaders\n");
+                    vkdev->reclaim_blob_allocator(allocator);
+                    return 0;
                 }
             }
             else // if (arithmetic_type == 0 || arithmetic_type == 1)
@@ -3178,7 +2928,10 @@ int main(int argc, char** argv)
             continue;
 
         const double score = scenario.is_copy ? vkpeak_copy(device_id, scenario.arg0, scenario.arg1) : vkpeak(device_id, scenario.arg0, scenario.arg1, scenario.arg2);
-        fprintf(stdout, "%-12s = %.2f %s\n", scenario.name, score, scenario.unit);
+        if (score == unsupported_matrix)
+            fprintf(stdout, "%-12s = unsupported\n", scenario.name);
+        else
+            fprintf(stdout, "%-12s = %.2f %s\n", scenario.name, score, scenario.unit);
     }
 
     ncnn::destroy_gpu_instance();

@@ -84,6 +84,8 @@ Available scenario names:
 
 For the 6-bit scenarios, `fp6-matrix` means E2M3 and `bf6-matrix` means E3M2. OCP names both encodings FP6; `bf6` is used here as a convenient range-oriented counterpart to `fp6`.
 
+The FP6 and FP4 scenarios require a matching cooperative matrix multiply-add configuration from the Vulkan driver. If the driver exposes the shader types alone, the scenarios report `unsupported`.
+
 If you encounter a crash or error, try upgrading your GPU driver:
 
 - Intel: https://downloadcenter.intel.com/product/80939/Graphics-Drivers
